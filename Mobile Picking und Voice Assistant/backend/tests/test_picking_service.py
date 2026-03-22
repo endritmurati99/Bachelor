@@ -86,6 +86,37 @@ class TestGetPickingDetail:
         assert result["name"] == "WH/INT/00001"
         assert len(result["move_lines"]) == 1
         assert result["move_lines"][0]["product_barcode"] == "4006381333931"
+        assert result["route_plan"]["next_move_line_id"] == 20
+
+    @pytest.mark.asyncio
+    async def test_filters_picked_lines_out_of_active_route(self, service, odoo):
+        odoo.search_read.side_effect = [
+            [{"id": 1, "name": "WH/INT/00001", "state": "assigned",
+              "move_ids": [10, 11], "location_id": [1, "Stock"], "location_dest_id": [2, "Out"],
+              "partner_id": False, "scheduled_date": False}],
+            [{"id": 5, "barcode": "4006381333931"}, {"id": 6, "barcode": "9780201379624"}],
+            [
+                {"id": 10, "product_uom_qty": 1, "picked": True},
+                {"id": 11, "product_uom_qty": 2, "picked": False},
+            ],
+        ]
+        odoo.execute_kw.side_effect = [
+            [20, 21],
+            [
+                {"id": 20, "product_id": [5, "Bereits gepickt"], "quantity": 1,
+                 "move_id": [10, "MOVE/10"], "location_id": [1, "WH/Stock/Lager Links/L-E1-P1"],
+                 "location_dest_id": [2, "WH/Output"], "lot_id": False},
+                {"id": 21, "product_id": [6, "Offen"], "quantity": 2,
+                 "move_id": [11, "MOVE/11"], "location_id": [1, "WH/Stock/Lager Rechts/L-E2-P4"],
+                 "location_dest_id": [2, "WH/Output"], "lot_id": False},
+            ],
+        ]
+
+        result = await service.get_picking_detail(1)
+
+        assert [line["id"] for line in result["move_lines"]] == [21]
+        assert result["route_plan"]["completed_stops"] == 1
+        assert result["route_plan"]["remaining_stops"] == 1
 
 
 # ── confirm_pick_line ────────────────────────────────────────

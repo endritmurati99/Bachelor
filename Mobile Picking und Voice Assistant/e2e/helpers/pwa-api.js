@@ -40,6 +40,33 @@ function createPickingDetail() {
         location_src: 'WH/Stock/Lager Rechts/L-E2-P4',
       },
     ],
+    route_plan: {
+      strategy: 'zone-first-shortest-walk',
+      total_stops: 2,
+      completed_stops: 0,
+      remaining_stops: 2,
+      estimated_travel_steps: 5,
+      next_move_line_id: 501,
+      next_location_src: 'WH/Stock/Lager Links/L-E1-P1',
+      next_product_name: 'Brick 2x2 orange',
+      zone_sequence: ['Lager Links', 'Lager Rechts'],
+      stops: [
+        {
+          sequence: 1,
+          move_line_id: 501,
+          product_name: 'Brick 2x2 orange',
+          location_src: 'WH/Stock/Lager Links/L-E1-P1',
+          estimated_steps_from_previous: 0,
+        },
+        {
+          sequence: 2,
+          move_line_id: 502,
+          product_name: 'Brick 2x2 hellgruen',
+          location_src: 'WH/Stock/Lager Rechts/L-E2-P4',
+          estimated_steps_from_previous: 5,
+        },
+      ],
+    },
   };
 }
 

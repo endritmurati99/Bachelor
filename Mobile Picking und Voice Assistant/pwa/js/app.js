@@ -26,6 +26,46 @@ function formatLocationForSpeech(locationPath) {
     return relevant.replace(/-/g, ' ').replace(/([A-Z])(\d)/g, '$1 $2');
 }
 
+function formatLocationForDisplay(locationPath) {
+    if (!locationPath) return 'Unbekannter Halt';
+    return locationPath
+        .split('/')
+        .filter(Boolean)
+        .slice(-2)
+        .join(' · ');
+}
+
+function renderRouteHint(picking, currentLineIndex) {
+    const routePlan = picking?.route_plan;
+    const lines = picking?.move_lines || [];
+    if (!routePlan || currentLineIndex >= lines.length) return '';
+
+    const remainingLines = lines.slice(currentLineIndex);
+    const remainingTravelScore = (routePlan.stops || [])
+        .slice(currentLineIndex)
+        .reduce((sum, stop) => sum + (stop.estimated_steps_from_previous || 0), 0);
+    const zonePreview = [...new Set(
+        remainingLines
+            .slice(0, 3)
+            .map(line => formatLocationForDisplay(line.location_src).split(' · ')[0])
+            .filter(Boolean)
+    )];
+    const nextLine = remainingLines[0];
+
+    return `
+        <section class="route-hint" aria-label="Optimierte Routenempfehlung">
+            <div class="route-hint__eyebrow">Route Intelligence</div>
+            <div class="route-hint__title">Naechster Halt: ${formatLocationForDisplay(nextLine.location_src)}</div>
+            <div class="route-hint__meta">
+                ${remainingLines.length} Stopps offen · Laufweg-Score ${remainingTravelScore}
+            </div>
+            <div class="route-hint__chips">
+                ${zonePreview.map(zone => `<span class="route-hint__chip">${zone}</span>`).join('')}
+            </div>
+        </section>
+    `;
+}
+
 // ── DOM-Referenzen ────────────────────────────────────────────
 const mainEl = () => document.getElementById('main');
 const statusEl = () => document.getElementById('status-indicator');
@@ -102,7 +142,7 @@ async function loadPickingDetail(pickingId) {
         const lines = picking.move_lines || [];
         if (lines.length > 0) {
             const l = lines[0];
-            speak(`Gehe zu ${formatLocationForSpeech(l.location_src)}. Artikel: ${l.product_name}. Menge: ${l.quantity_demand}`);
+            speak(`Optimierte Route aktiv. Gehe zu ${formatLocationForSpeech(l.location_src)}. Artikel: ${l.product_name}. Menge: ${l.quantity_demand}`);
         }
     } catch (e) {
         mainEl().innerHTML = renderError('Fehler beim Laden: ' + e.message);
@@ -144,6 +184,7 @@ function renderCurrentLine() {
                             style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem">← Liste</button>
                 </span>
             </div>
+            ${renderRouteHint(currentPicking, currentLineIndex)}
             ${renderPickCard({
                 ...line,
                 quantity_demand: line.quantity_demand,

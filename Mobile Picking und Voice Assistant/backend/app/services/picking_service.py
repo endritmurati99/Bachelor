@@ -9,6 +9,7 @@ import re
 
 from app.services.n8n_webhook import N8NWebhookClient
 from app.services.odoo_client import OdooAPIError, OdooClient
+from app.services.route_optimizer import build_route_plan
 
 
 def _clean_product_name(display_name: str) -> str:
@@ -134,8 +135,17 @@ class PickingService:
                 }
             )
 
-        picking["move_lines"] = move_lines
+        route_plan = build_route_plan(move_lines)
+        picking["move_lines"] = route_plan.pop("ordered_move_lines")
+        picking["route_plan"] = route_plan
         return picking
+
+    async def get_picking_route_plan(self, picking_id: int) -> dict:
+        """Expose the computed route plan for UI hints and later simulations."""
+        picking = await self.get_picking_detail(picking_id)
+        if picking.get("error"):
+            return picking
+        return picking.get("route_plan", build_route_plan([]))
 
     async def confirm_pick_line(
         self,

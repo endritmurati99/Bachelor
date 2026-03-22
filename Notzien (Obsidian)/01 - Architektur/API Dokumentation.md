@@ -18,7 +18,8 @@ tags:
 | ------- | ---- | ------------ |
 | `GET` | `/api/health` | Health Check |
 | `GET` | `/api/pickings` | Offene Pickings (state=assigned) |
-| `GET` | `/api/pickings/{id}` | Picking-Details + Move-Lines + Barcodes |
+| `GET` | `/api/pickings/{id}` | Picking-Details + optimierte Rest-Route |
+| `GET` | `/api/pickings/{id}/route-plan` | Deterministische Routenempfehlung fuer offene Positionen |
 | `POST` | `/api/pickings/{id}/confirm-line` | Zeile per Scan bestätigen |
 | `POST` | `/api/quality-alerts` | Quality Alert + Foto erstellen |
 | `POST` | `/api/voice/recognize` | Audio → Transkript + Intent |
@@ -37,6 +38,37 @@ tags:
   "success": true,
   "message": "Bestätigt.",
   "picking_complete": false
+}
+```
+
+### `GET /api/pickings/{id}/route-plan`
+
+**Beschreibung:**
+- berechnet eine nachvollziehbare Picking-Reihenfolge aus `location_src`
+- liefert nur noch offene Positionen als aktive Stopps
+- nutzt aktuell die deterministische Heuristik `zone-first-shortest-walk`
+
+**Response:**
+```json
+{
+  "strategy": "zone-first-shortest-walk",
+  "total_stops": 5,
+  "completed_stops": 1,
+  "remaining_stops": 4,
+  "estimated_travel_steps": 9,
+  "next_move_line_id": 501,
+  "next_location_src": "WH/Stock/Lager Links/L-E1-P1",
+  "next_product_name": "Brick 2x2 orange",
+  "zone_sequence": ["Lager Links", "Lager Rechts"],
+  "stops": [
+    {
+      "sequence": 1,
+      "move_line_id": 501,
+      "product_name": "Brick 2x2 orange",
+      "location_src": "WH/Stock/Lager Links/L-E1-P1",
+      "estimated_steps_from_previous": 0
+    }
+  ]
 }
 ```
 

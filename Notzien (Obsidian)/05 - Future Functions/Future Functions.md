@@ -37,6 +37,12 @@ tags:
 
 ## PWA / UI Design
 
+### Route Intelligence weiter ausbauen
+- **Status:** MVP seit 2026-03-22 umgesetzt
+- **Aktuell:** Offene Pick-Positionen werden im Backend deterministisch nach Lagerzone und Slot sortiert; die PWA zeigt dazu einen kompakten Routenhinweis
+- **Nächster Schritt:** Echte Wegezeiten statt Heuristik, z. B. mit Regal-Matrix, Laufweg-Schaetzung und spaeter optional Mitarbeiter-Standort
+- **Priorität:** Mittel
+
 ### Scanner-UI überarbeiten
 - **Problem:** Aktuelles Design ist funktional aber nicht optimal für Lagerumgebung (Handschuhe, Licht)
 - **Idee:** Größere Touch-Targets, höherer Kontrast, One-Hand-Bedienung

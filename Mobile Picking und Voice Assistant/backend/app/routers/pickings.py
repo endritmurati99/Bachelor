@@ -26,6 +26,12 @@ async def get_picking(picking_id: int, service=Depends(get_picking_service)):
     return await service.get_picking_detail(picking_id)
 
 
+@router.get("/pickings/{picking_id}/route-plan")
+async def get_route_plan(picking_id: int, service=Depends(get_picking_service)):
+    """Optimierte Reihenfolge fuer verbleibende Picking-Positionen."""
+    return await service.get_picking_route_plan(picking_id)
+
+
 @router.post("/pickings/{picking_id}/confirm-line")
 async def confirm_line(
     picking_id: int,

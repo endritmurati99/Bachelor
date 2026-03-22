@@ -93,3 +93,41 @@ nav {
     border: none; border-radius: var(--radius); font-size: 1.1rem; font-weight: 600;
     cursor: pointer; margin-top: 12px;
 }
+.route-hint {
+    background: linear-gradient(135deg, rgba(15,52,96,0.95), rgba(25,32,58,0.98));
+    border: 1px solid rgba(233,69,96,0.3);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+}
+.route-hint__eyebrow {
+    color: var(--accent-text);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+.route-hint__title {
+    margin-top: 6px;
+    font-size: 1rem;
+    font-weight: 700;
+}
+.route-hint__meta {
+    margin-top: 6px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+.route-hint__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+.route-hint__chip {
+    background: rgba(233,69,96,0.18);
+    color: var(--text-primary);
+    border: 1px solid rgba(233,69,96,0.25);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.78rem;
+}
