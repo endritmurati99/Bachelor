@@ -33,6 +33,29 @@ Die Evaluation folgt dem **Within-Subjects-Design**:
 
 ---
 
+## Ergänzende technische Integrations-Evaluation
+
+> [!info] Separate Teil-Evaluation
+> Neben der Nutzerevaluation wird eine kleine technische Evaluation der Integrationsmuster durchgeführt.
+> Sie ersetzt **nicht** den Vergleich Papier vs. System, sondern ergänzt ihn um die Frage, wie n8n-Ereignisse robust verarbeitet werden.
+
+**Verglichene Muster:**
+- `Webhook`: schnelle Folgeaktion nach erfolgreichem Event im Backend
+- `Polling`: periodischer Reconciliation-Job als Safety Net bei verpassten Webhooks
+
+| Metrik | Webhook | Polling |
+| ------ | ------- | ------- |
+| Reaktionszeit | niedrig | intervallabhängig |
+| Recovery nach Ausfall | nur mit zusätzlicher Recovery-Logik | gut geeignet als Safety Net |
+| Systemlast | viele kleine Requests | planbare Batch-Reads |
+| Implementierungsaufwand | Error-Handling und Idempotenz nötig | einfacher Trigger, aber saubere Marker nötig |
+
+> [!note] Wichtige Abgrenzung
+> Gemessen wird die Orchestrierungsstrecke zwischen FastAPI/Odoo und n8n.
+> Die direkte Nutzerreaktion in PWA oder TTS ist **nicht** Teil dieses Vergleichs.
+
+---
+
 ## Messgrößen
 
 ### Quantitativ (System-Logs)
@@ -43,6 +66,9 @@ Die Evaluation folgt dem **Within-Subjects-Design**:
 | Fehlerquote Scan | % | Falsche Barcodes / Gesamt |
 | Voice-Erkennungsrate | % | `confidence ≥ 0.7` / Gesamt |
 | Quality-Report-Zeit | Sekunden | Alert-Start bis Alert-Erstellt |
+| Webhook-Latenz | Millisekunden | Event gespeichert → erste n8n-Execution |
+| Recovery-Zeit Polling | Sekunden oder Minuten | verpasstes Event → Polling zieht nach |
+| Duplikatquote | % | doppelt verarbeitete Events / Gesamt |
 | Systemfehler | Anzahl | Error-Log |
 
 ### Quantitativ (Fragebogen)
@@ -122,6 +148,12 @@ d = (np.mean(times_a) - np.mean(times_b)) / np.std(np.array(times_a + times_b))
 
 Zu berichten: t-Wert, df, p-Wert, Cohen's d, 95%-Konfidenzintervall.
 
+Für die technische Integrations-Evaluation genügen primär deskriptive Kennzahlen:
+- Median und p95 der Webhook-Latenz
+- mittlere Recovery-Zeit nach n8n-Ausfall
+- Anzahl verlorener oder doppelt verarbeiteter Events
+- CPU/RAM-Snapshots für Backend, n8n und Odoo
+
 ---
 
 ## Härtungsmaßnahmen (vor Evaluation)
@@ -129,9 +161,10 @@ Zu berichten: t-Wert, df, p-Wert, Cohen's d, 95%-Konfidenzintervall.
 > [!info] Härtung = Robustheit für den Evaluationszeitraum (nicht Produktionssicherheit)
 
 - [ ] Odoo-Verbindungsfehler: Retry-Logik (3 Versuche, exponential backoff)
-- [ ] Vosk-Timeout: 10s Fallback mit Toast-Meldung
+- [ ] Whisper-Timeout: 10s Fallback mit Toast-Meldung
 - [ ] PWA Offline-Indicator: Rotes Banner bei `navigator.onLine === false`
 - [ ] Logging: Alle API-Requests mit Timestamp, User-Action, Response-Code
+- [ ] Sync-Marker oder Outbox-Logik für Reconciliation vorbereiten
 - [ ] Docker Restart-Policy: `unless-stopped` auf allen Services (bereits gesetzt)
 - [ ] `.env` Backup: Vor Evaluation sichern
 

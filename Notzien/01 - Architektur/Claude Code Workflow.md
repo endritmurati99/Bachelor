@@ -22,11 +22,11 @@ Das Repository wurde auf einen schlankeren Claude-Code-Workflow umgestellt, dami
 
 ## DX-Fazit zu Leerzeichen in Pfaden
 
-Die Leerzeichen in `Mobile Picking und Voice Assistant/` und `Notzien (Obsidian)/` sind vor allem ein Command-Line-Thema, kein Laufzeitfehler.
+Die Leerzeichen in `Mobile Picking und Voice Assistant/` sind vor allem ein Command-Line-Thema, kein Laufzeitfehler.
 
 Bewusste Entscheidung:
-- keine sofortige Umbenennung der Wurzelordner, weil das in einem bereits aktiven und lokal veraenderten Repo einen grossen Blast Radius ueber Hooks, MCP, Obsidian-Links und offene Arbeitsstaende haette
-- stattdessen kurze, leerzeichenfreie Einstiegspunkte im Repo-Root: `workflow.ps1` und `workflow.cmd`
+- der Notiz-Ordner wurde auf `Notzien/` vereinheitlicht, damit Obsidian, Hooks und Projektlinks nur noch einen Zielpfad haben
+- fuer den Produktordner mit Leerzeichen bleiben im Repo-Root weiterhin die kurzen Einstiegspunkte `workflow.ps1` und `workflow.cmd`
 
 Praxisnutzen:
 - `workflow verify`
@@ -121,7 +121,7 @@ Aktueller Praxispunkt:
 
 Ein `PostToolUse`-Hook schreibt jede von Claude Code bearbeitete Datei nach:
 
-`Notzien (Obsidian)/04 - Ressourcen/Claude Code Aenderungslog.md`
+`Notzien/04 - Ressourcen/Claude Code Aenderungslog.md`
 
 Zusaetzlich sollen Architektur- und Prozessentscheidungen weiterhin manuell in der Daily Note dokumentiert werden.
 

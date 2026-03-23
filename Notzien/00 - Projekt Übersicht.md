@@ -58,6 +58,7 @@ aliases:
 
 ### Ressourcen
 - [[04 - Ressourcen/Links|Ressourcen & Links]] — Externe Docs, Vosk, Caddy, n8n
+- [[05 - Future Functions/Future Functions|Future Functions]] — Roadmap nach MVP, Visual Sight Loop, proaktive n8n-Ideen
 
 ## MVP — Vertikaler Slice
 

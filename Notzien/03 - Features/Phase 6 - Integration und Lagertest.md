@@ -24,7 +24,7 @@ Das System unter realistischen Bedingungen testen:
 - **20 Picks ohne Systemfehler** durchführen
 - Voice-Erkennungsrate messen
 - Quality Alert im Live-Szenario testen
-- System-Resilienz testen (Odoo-Restart, Netzwerkausfall)
+- System-Resilienz testen (Odoo-Restart, Netzwerkausfall, n8n-Ausfall)
 
 ---
 
@@ -93,6 +93,38 @@ Alle vorherigen Phasen müssen bestanden sein:
 4. Picking weiterführen → funktioniert
 ```
 
+### Szenario 6: Technischer Integrationsvergleich (Webhook vs. Polling)
+
+> [!info] Ergänzt den Lagertest, ersetzt ihn nicht
+> Dieses Szenario misst die Orchestrierung zwischen FastAPI, Odoo und n8n.
+> Der eigentliche Picking- und Quality-Flow bleibt dafür unverändert.
+
+**Teil A: Speed-Test**
+```
+1. 20 Picks oder 20 Quality-Alerts nacheinander auslösen
+2. Timestamp beim erfolgreichen Backend-Write notieren
+3. Erste n8n-Execution-Zeit notieren
+4. Differenz als Webhook-Latenz auswerten
+```
+
+**Teil B: Crash-Test**
+```
+1. n8n-Container stoppen
+2. Quality Alert oder Picking-Abschluss normal in der PWA auslösen
+3. Webhook fällt aus
+4. n8n wieder starten
+5. Reconciliation-Workflow per Polling suchen lassen
+6. Recovery-Zeit bis zur nachgezogenen Verarbeitung messen
+```
+
+**Teil C: Last-Test**
+```
+1. 100 Events in 1 Minute simulieren
+2. Einmal mit direkter Webhook-Verarbeitung messen
+3. Einmal mit zusätzlichem Polling-Abgleich messen
+4. CPU/RAM auf Backend, n8n und Odoo vergleichen
+```
+
 ---
 
 ## Messgrößen
@@ -105,6 +137,9 @@ Diese Daten werden für die Bachelorarbeit benötigt:
 | Fehlerquote | % | Anzahl falscher Scans / Gesamtscans |
 | Voice-Erkennungsrate | % | `confidence >= 0.7` / Gesamt-Requests |
 | Quality-Report-Zeit | Sekunden | Timestamp Alert-Start → Alert-Erstellt |
+| Webhook-Latenz | Millisekunden | Odoo/Backend-Event → erste n8n-Execution |
+| Recovery-Zeit nach n8n-Ausfall | Sekunden oder Minuten | fehlgeschlagenes Event → Polling findet Event |
+| Integrationslast | CPU/RAM/API-Calls | Backend, n8n und Odoo parallel beobachten |
 | Systemverfügbarkeit | % | Uptime-Log |
 
 ```bash
@@ -122,12 +157,12 @@ docker compose logs --since 2h backend | grep "STT:"
 > Lösung: Dual-Band Router, 5GHz für mobile Geräte.
 
 > [!warning] Lärm und Voice-Erkennung
-> Lagerlärm (Gabelstapler, Lüftung) kann Vosk-Erkennungsrate senken.
+> Lagerlärm (Gabelstapler, Lüftung) kann die Whisper-Erkennungsrate senken.
 > Lösung: Headset mit Geräuschunterdrückung oder Touch-Fallback.
 
 > [!warning] iOS Mikrofon-Permission nach App-Suspend
 > Nach längerem Suspend kann iOS die Mikrofon-Permission zurückziehen.
-> Lösung: Vor jedem PTT-Druck Permission prüfen.
+> Lösung: Vor jedem Start der Sprachaufnahme Permission prüfen.
 
 ---
 

@@ -27,17 +27,17 @@ Automatisches Protokoll fuer von Claude Code bearbeitete Dateien.
 - 2026-03-22 16:00:00 | bootstrap | `Mobile Picking und Voice Assistant/infrastructure/scripts/workflow.ps1`
 - 2026-03-22 16:00:00 | bootstrap | `Mobile Picking und Voice Assistant/.env.example`
 - 2026-03-22 16:00:00 | bootstrap | `Mobile Picking und Voice Assistant/docker-compose.yml`
-- 2026-03-22 16:00:00 | bootstrap | `Notzien (Obsidian)/01 - Architektur/Claude Code Workflow.md`
+- 2026-03-22 16:00:00 | bootstrap | `Notzien/01 - Architektur/Claude Code Workflow.md`
 - 2026-03-22 16:34:11 | verification | `Mobile Picking und Voice Assistant/CLAUDE.md`
 - 2026-03-22 16:37:22 | Edit | `Mobile Picking und Voice Assistant/odoo/addons/quality_alert_custom/models/quality_alert.py`
 - 2026-03-22 16:45:11 | Edit | `Mobile Picking und Voice Assistant/backend/app/services/odoo_client.py`
 - 2026-03-22 16:45:22 | Edit | `Mobile Picking und Voice Assistant/pwa/js/app.js`
-- 2026-03-22 16:45:58 | Edit | `Notzien (Obsidian)/02 - Daily Notes/2026-03-22.md`
+- 2026-03-22 16:45:58 | Edit | `Notzien/02 - Daily Notes/2026-03-22.md`
 - 2026-03-22 16:54:58 | Edit | `Mobile Picking und Voice Assistant/backend/app/services/picking_service.py`
 - 2026-03-22 16:55:10 | Edit | `Mobile Picking und Voice Assistant/odoo/addons/quality_alert_custom/models/quality_alert.py`
 - 2026-03-22 16:55:19 | Edit | `Mobile Picking und Voice Assistant/odoo/addons/quality_alert_custom/views/quality_alert_views.xml`
-- 2026-03-22 16:55:59 | Edit | `Notzien (Obsidian)/02 - Daily Notes/2026-03-22.md`
-- 2026-03-22 16:56:07 | Edit | `Notzien (Obsidian)/02 - Daily Notes/2026-03-22.md`
+- 2026-03-22 16:55:59 | Edit | `Notzien/02 - Daily Notes/2026-03-22.md`
+- 2026-03-22 16:56:07 | Edit | `Notzien/02 - Daily Notes/2026-03-22.md`
 - 2026-03-22 16:58:42 | Write | `Mobile Picking und Voice Assistant/CLAUDE.md`
 - 2026-03-22 16:59:33 | Write | `Mobile Picking und Voice Assistant/CLAUDE.md`
 - 2026-03-22 17:06:01 | Edit | `Mobile Picking und Voice Assistant/odoo/addons/quality_alert_custom/models/quality_alert.py`
@@ -62,9 +62,9 @@ Automatisches Protokoll fuer von Claude Code bearbeitete Dateien.
 - 2026-03-22 17:26:31 | workflow | `Mobile Picking und Voice Assistant/infrastructure/scripts/workflow.ps1`
 - 2026-03-22 17:26:31 | verification | `Mobile Picking und Voice Assistant/infrastructure/scripts/workflow.ps1`
 - 2026-03-22 17:26:32 | verification | `Mobile Picking und Voice Assistant/playwright.config.js`
-- 2026-03-22 17:48:09 | Edit | `Notzien (Obsidian)/02 - Daily Notes/2026-03-22.md`
-- 2026-03-22 17:48:20 | Edit | `Notzien (Obsidian)/02 - Daily Notes/2026-03-22.md`
-- 2026-03-22 17:50:36 | Edit | `Notzien (Obsidian)/02 - Daily Notes/2026-03-22.md`
+- 2026-03-22 17:48:09 | Edit | `Notzien/02 - Daily Notes/2026-03-22.md`
+- 2026-03-22 17:48:20 | Edit | `Notzien/02 - Daily Notes/2026-03-22.md`
+- 2026-03-22 17:50:36 | Edit | `Notzien/02 - Daily Notes/2026-03-22.md`
 - 2026-03-22 17:59:31 | Edit | `Mobile Picking und Voice Assistant/pwa/css/app.css`
 - 2026-03-22 17:59:38 | Edit | `Mobile Picking und Voice Assistant/pwa/js/app.js`
 - 2026-03-22 17:59:44 | Edit | `Mobile Picking und Voice Assistant/pwa/js/app.js`
@@ -97,7 +97,7 @@ Automatisches Protokoll fuer von Claude Code bearbeitete Dateien.
 - 2026-03-22 21:23:30 | workflow | `workflow.ps1`
 - 2026-03-22 21:23:31 | workflow | `workflow.cmd`
 - 2026-03-22 21:23:32 | workflow | `CLAUDE.md`
-- 2026-03-22 21:23:33 | workflow | `Notzien (Obsidian)/01 - Architektur/Claude Code Workflow.md`
+- 2026-03-22 21:23:33 | workflow | `Notzien/01 - Architektur/Claude Code Workflow.md`
 - 2026-03-22 18:37:14 | Edit | `Mobile Picking und Voice Assistant/.env`
 - 2026-03-22 18:42:34 | Edit | `Mobile Picking und Voice Assistant/backend/app/routers/voice.py`
 - 2026-03-22 18:42:42 | Edit | `Mobile Picking und Voice Assistant/backend/app/routers/voice.py`
@@ -123,7 +123,7 @@ Automatisches Protokoll fuer von Claude Code bearbeitete Dateien.
 - 2026-03-22 21:53:43 | Edit | `Mobile Picking und Voice Assistant/docker-compose.yml`
 - 2026-03-22 21:53:50 | verification | `Mobile Picking und Voice Assistant/e2e/a11y.spec.js`
 - 2026-03-22 21:53:51 | verification | `Mobile Picking und Voice Assistant/infrastructure/scripts/workflow.ps1`
-- 2026-03-22 21:54:10 | workflow | `Notzien (Obsidian)/01 - Architektur/Claude Code Workflow.md`
+- 2026-03-22 21:54:10 | workflow | `Notzien/01 - Architektur/Claude Code Workflow.md`
 - 2026-03-22 21:55:16 | Edit | `Mobile Picking und Voice Assistant/backend/app/services/whisper_client.py`
 - 2026-03-22 21:57:18 | Write | `Mobile Picking und Voice Assistant/pwa/js/voice.js`
 - 2026-03-22 21:57:23 | Edit | `Mobile Picking und Voice Assistant/pwa/js/app.js`
@@ -141,7 +141,7 @@ Automatisches Protokoll fuer von Claude Code bearbeitete Dateien.
 - 2026-03-22 21:59:38 | verification | `.claude/artifacts/ui_state-list.png`
 - 2026-03-22 21:59:38 | verification | `.claude/artifacts/ui_state-detail.png`
 - 2026-03-22 21:59:39 | verification | `.claude/artifacts/ui_state-alert.png`
-- 2026-03-22 22:00:34 | workflow | `Notzien (Obsidian)/01 - Architektur/Claude Code Workflow.md`
+- 2026-03-22 22:00:34 | workflow | `Notzien/01 - Architektur/Claude Code Workflow.md`
 - 2026-03-22 22:01:49 | verification | `.claude/artifacts/ui_state-live-list.png`
 - 2026-03-22 22:04:10 | Edit | `Mobile Picking und Voice Assistant/e2e/capture-sight.js`
 - 2026-03-22 22:04:11 | Edit | `.claude/hooks/enforce_completion.py`
@@ -150,9 +150,9 @@ Automatisches Protokoll fuer von Claude Code bearbeitete Dateien.
 - 2026-03-22 22:06:18 | verification | `.claude/artifacts/ui_state-index.json`
 - 2026-03-22 22:06:19 | verification | `.claude/artifacts/ui_state-list.json`
 - 2026-03-22 22:06:20 | verification | `Mobile Picking und Voice Assistant/infrastructure/scripts/workflow.ps1`
-- 2026-03-22 22:06:21 | workflow | `Notzien (Obsidian)/01 - Architektur/Claude Code Workflow.md`
+- 2026-03-22 22:06:21 | workflow | `Notzien/01 - Architektur/Claude Code Workflow.md`
 - 2026-03-22 22:10:05 | bootstrap | `.claude/rules/odoo.md`
-- 2026-03-22 22:10:06 | workflow | `Notzien (Obsidian)/01 - Architektur/Claude Code Workflow.md`
+- 2026-03-22 22:10:06 | workflow | `Notzien/01 - Architektur/Claude Code Workflow.md`
 - 2026-03-22 22:19:10 | bootstrap | `Mobile Picking und Voice Assistant/e2e/visual.spec.js`
 - 2026-03-22 22:19:11 | workflow | `Mobile Picking und Voice Assistant/Makefile`
 - 2026-03-22 22:19:12 | workflow | `Mobile Picking und Voice Assistant/infrastructure/scripts/workflow.ps1`
@@ -163,7 +163,7 @@ Automatisches Protokoll fuer von Claude Code bearbeitete Dateien.
 - 2026-03-22 22:21:10 | workflow | `.claude/hooks/enforce_completion.py`
 - 2026-03-22 22:21:11 | workflow | `.claude/rules/frontend.md`
 - 2026-03-22 22:21:12 | workflow | `Mobile Picking und Voice Assistant/playwright.config.js`
-- 2026-03-22 22:22:20 | workflow | `Notzien (Obsidian)/01 - Architektur/Claude Code Workflow.md`
+- 2026-03-22 22:22:20 | workflow | `Notzien/01 - Architektur/Claude Code Workflow.md`
 - 2026-03-22 22:05:12 | Edit | `Mobile Picking und Voice Assistant/docker-compose.yml`
 - 2026-03-22 22:06:32 | Edit | `Mobile Picking und Voice Assistant/backend/app/services/whisper_client.py`
 - 2026-03-22 22:10:18 | Write | `C:/Users/endri/.claude/projects/c--Users-endri/memory/project_future_nlp_voice.md`
@@ -175,3 +175,33 @@ Automatisches Protokoll fuer von Claude Code bearbeitete Dateien.
 - 2026-03-22 22:17:26 | Edit | `Mobile Picking und Voice Assistant/pwa/js/app.js`
 - 2026-03-22 22:19:19 | Write | `Mobile Picking und Voice Assistant/pwa/js/voice.js`
 - 2026-03-22 22:21:32 | Write | `Mobile Picking und Voice Assistant/pwa/js/voice.js`
+- 2026-03-22 22:30:19 | Write | `Mobile Picking und Voice Assistant/pwa/js/voice.js`
+- 2026-03-22 22:32:37 | Write | `Mobile Picking und Voice Assistant/pwa/js/voice.js`
+- 2026-03-22 22:47:12 | Edit | `Notzien/01 - Architektur/Voice Intent Engine.md`
+- 2026-03-22 22:47:36 | Edit | `Notzien/01 - Architektur/Voice Intent Engine.md`
+- 2026-03-22 22:47:42 | Edit | `Notzien/01 - Architektur/Voice Intent Engine.md`
+- 2026-03-22 22:48:10 | Edit | `Notzien/01 - Architektur/Voice Intent Engine.md`
+- 2026-03-22 22:49:27 | Write | `Notzien/03 - Features/Phase 4 - Voice Picking.md`
+- 2026-03-22 22:50:29 | Edit | `Notzien/05 - Future Functions/Future Functions.md`
+- 2026-03-22 22:50:42 | Edit | `Mobile Picking und Voice Assistant/docs/DECISIONS.md`
+- 2026-03-22 22:50:52 | Edit | `Mobile Picking und Voice Assistant/docs/DECISIONS.md`
+- 2026-03-22 22:51:11 | Write | `Mobile Picking und Voice Assistant/docs/VOICE_COMMANDS.md`
+- 2026-03-22 22:51:44 | Edit | `Notzien/02 - Daily Notes/2026-03-22.md`
+- 2026-03-22 22:51:56 | Edit | `C:/Users/endri/.claude/projects/c--Users-endri/memory/project_picking_assistant.md`
+- 2026-03-23 10:06:17 | Edit | `Mobile Picking und Voice Assistant/pwa/js/voice.js`
+- 2026-03-23 10:06:23 | Edit | `Mobile Picking und Voice Assistant/pwa/js/app.js`
+- 2026-03-23 10:06:29 | Edit | `Mobile Picking und Voice Assistant/pwa/js/app.js`
+- 2026-03-23 10:47:10 | Edit | `Mobile Picking und Voice Assistant/backend/app/services/picking_service.py`
+- 2026-03-23 10:49:28 | Edit | `Mobile Picking und Voice Assistant/backend/tests/test_picking_service.py`
+- 2026-03-23 10:49:32 | Edit | `Mobile Picking und Voice Assistant/backend/tests/test_picking_service.py`
+- 2026-03-23 11:03:27 | Edit | `Mobile Picking und Voice Assistant/pwa/js/voice.js`
+- 2026-03-23 11:03:32 | Edit | `Mobile Picking und Voice Assistant/pwa/js/voice.js`
+- 2026-03-23 11:03:38 | Edit | `Mobile Picking und Voice Assistant/pwa/js/voice.js`
+- 2026-03-23 11:03:51 | Edit | `Mobile Picking und Voice Assistant/pwa/js/app.js`
+- 2026-03-23 11:13:59 | Edit | `Mobile Picking und Voice Assistant/backend/app/services/intent_engine.py`
+- 2026-03-23 11:14:50 | Edit | `Mobile Picking und Voice Assistant/pwa/js/app.js`
+- 2026-03-23 11:15:10 | Edit | `Mobile Picking und Voice Assistant/pwa/js/app.js`
+- 2026-03-23 11:15:20 | Edit | `Mobile Picking und Voice Assistant/pwa/js/app.js`
+- 2026-03-23 11:15:27 | Edit | `Mobile Picking und Voice Assistant/pwa/js/app.js`
+- 2026-03-23 11:15:33 | Edit | `Mobile Picking und Voice Assistant/pwa/js/app.js`
+- 2026-03-23 11:15:42 | Edit | `Mobile Picking und Voice Assistant/pwa/css/app.css`

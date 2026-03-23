@@ -28,6 +28,32 @@ status: pending
 
 ---
 
+## Erweiterung: Hybrid aus Webhook + Polling
+
+> [!info] Ohne Eingriff in den aktuellen Teststand
+> Die bestehende Webhook-Architektur bleibt unverändert.
+> Für den aktuellen PoC bleibt **FastAPI der einzige Event-Sender** in Richtung n8n.
+> Odoo Automated Actions werden vorerst bewusst **nicht** zusätzlich eingeführt.
+
+### Webhook-Pfad (aktueller Stand)
+
+- FastAPI schreibt zuerst in Odoo und feuert danach `pick-confirmed` bzw. `quality-alert-created` an n8n.
+- Die unmittelbare Nutzerreaktion bleibt in PWA + Backend; n8n verarbeitet nur Folgeaktionen.
+- Für Messungen bedeutet das: Webhook-Latenz meint die Zeit zwischen erfolgreichem Odoo-Write und Start der n8n-Execution, nicht die TTS-Reaktion auf dem Handy.
+
+### Polling-Pfad (geplante Erweiterung)
+
+- Ergänzender n8n-Workflow mit `Schedule Trigger` als Reconciliation-Job
+- Intervall: alle 5-10 Minuten
+- Ziel: Odoo-Datensätze finden, die fachlich abgeschlossen oder neu erzeugt sind, aber noch nicht durch n8n nachverarbeitet wurden
+- Zweck: verpasste Events nach n8n-Ausfall, WLAN-Abbruch oder Neustart automatisch nachziehen
+
+> [!caution] Voraussetzung für sauberes Polling
+> Für einen belastbaren Vergleich braucht der PoC später einen expliziten Sync-Marker wie `orchestrated_at`, `sync_status` oder eine kleine Outbox-Logik.
+> Ohne solchen Marker kann Polling nur heuristisch erkennen, ob ein Event bereits verarbeitet wurde.
+
+---
+
 ## Existierende Workflows
 
 Alle drei Workflow-Dateien sind in `n8n/workflows/` als JSON-Export vorhanden und können direkt importiert werden.
@@ -95,8 +121,11 @@ In n8n nach Aktivierung die Webhook-URLs kopieren:
 
 **Aktueller Flow:**
 1. Webhook empfangen
-2. Prüfen ob `picking_complete == true`
-3. Log-Eintrag erstellen
+2. Prüfen ob `picking_id` vorhanden ist
+3. JSON-Response `{"status": "received"}` zurückgeben
+
+> [!note] Vorbereitete Erweiterung
+> Ein zusätzlicher Verarbeitungs- oder Log-Schritt kann später an denselben Webhook gehängt werden.
 
 **Erweiterungsmöglichkeiten:**
 - Odoo HTTP Request: Picking-Name + Produkte abfragen
