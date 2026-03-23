@@ -205,3 +205,21 @@ Automatisches Protokoll fuer von Claude Code bearbeitete Dateien.
 - 2026-03-23 11:15:27 | Edit | `Mobile Picking und Voice Assistant/pwa/js/app.js`
 - 2026-03-23 11:15:33 | Edit | `Mobile Picking und Voice Assistant/pwa/js/app.js`
 - 2026-03-23 11:15:42 | Edit | `Mobile Picking und Voice Assistant/pwa/css/app.css`
+- 2026-03-23 11:27:44 | Write | `Mobile Picking und Voice Assistant/pwa/js/feedback.js`
+- 2026-03-23 11:27:49 | Edit | `Mobile Picking und Voice Assistant/backend/app/services/intent_engine.py`
+- 2026-03-23 11:27:50 | Edit | `Mobile Picking und Voice Assistant/pwa/js/app.js`
+- 2026-03-23 11:27:54 | Edit | `Mobile Picking und Voice Assistant/backend/app/routers/pickings.py`
+- 2026-03-23 11:27:59 | Edit | `Mobile Picking und Voice Assistant/pwa/js/app.js`
+- 2026-03-23 11:28:04 | Edit | `Mobile Picking und Voice Assistant/pwa/js/app.js`
+- 2026-03-23 11:28:05 | Edit | `Mobile Picking und Voice Assistant/backend/app/routers/pickings.py`
+- 2026-03-23 11:28:12 | Edit | `Mobile Picking und Voice Assistant/backend/app/routers/pickings.py`
+- 2026-03-23 11:28:12 | Edit | `Mobile Picking und Voice Assistant/pwa/js/app.js`
+- 2026-03-23 11:28:20 | Edit | `Mobile Picking und Voice Assistant/pwa/css/app.css`
+- 2026-03-23 11:28:31 | Edit | `Mobile Picking und Voice Assistant/pwa/js/app.js`
+- 2026-03-23 11:37:13 | Write | `Notzien/02 - Daily Notes/2026-03-23.md`
+- 2026-03-23 11:37:32 | Edit | `Notzien/05 - Future Functions/Future Functions.md`
+- 2026-03-23 11:37:41 | Edit | `Notzien/05 - Future Functions/Future Functions.md`
+- 2026-03-23 11:37:52 | Edit | `Notzien/05 - Future Functions/Future Functions.md`
+- 2026-03-23 11:38:18 | Edit | `Notzien/01 - Architektur/Voice Intent Engine.md`
+- 2026-03-23 11:38:28 | Edit | `Notzien/01 - Architektur/Voice Intent Engine.md`
+- 2026-03-23 11:38:38 | Edit | `Notzien/01 - Architektur/Voice Intent Engine.md`

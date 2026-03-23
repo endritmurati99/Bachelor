@@ -40,17 +40,17 @@ tags:
 - **Problem:** Round-Trip ~2-4s (700ms Stille + 1-2s Whisper + Netzwerk)
 - **Nutzer-Feedback:** "Es funktioniert, aber es könnte noch schneller sein."
 - **Optionen:** Kürzere Stille-Schwelle, Whisper `tiny`, Audio-Streaming, VAD im Browser
-- **Priorität:** Hoch
+- **Stand 2026-03-23:** `SILENCE_AFTER_SPEECH` auf 400ms gesenkt (−300ms). Whisper `tiny` und Audio-Streaming noch offen.
+- **Priorität:** Mittel (teilweise erledigt)
 
-### M-Taste: Voice-Modus global / Navigation-Problem
-- **Problem:** Voice-Modus per M-Taste bleibt aktiv auch wenn Mic-Button bei Seitenwechsel versteckt wird
-- **Lösungsideen:** Permanenter Status-Indikator, auto-deaktivieren bei Navigation, Floating Mic-Button
-- **Priorität:** Hoch
+### ~~M-Taste: Voice-Modus global / Navigation-Problem~~ ✅ Erledigt 2026-03-23
+- **Lösung:** `stopVoiceMode()` in `voice.js` exportiert; `updateToolbar()` in `app.js` stoppt Voice automatisch wenn `view !== 'detail'`.
 
 ### Barcode-Nummern nicht vorlesen
 - **Problem:** TTS liest 9-stellige Barcode-Nummern vor (z.B. "6-1-0-1-1-2-1") — unbrauchbar im Lager
+- **Stand:** speak()-Aufrufe in app.js nutzen bereits `product_name` und `location_src` — keine Barcodes direkt. In der Praxis kein akutes Problem, aber noch nicht explizit gefiltert.
 - **Lösung:** Barcodes aus dem TTS-Text herausfiltern, stattdessen nur Produktname + Lagerort vorlesen
-- **Priorität:** Hoch
+- **Priorität:** Niedrig (implizit gelöst)
 
 ### Intelligenterer Voice Agent (ElevenLabs / KI-Stimme)
 - **Idee:** Browser-TTS (SpeechSynthesis) ersetzen durch ElevenLabs oder ähnliches
@@ -58,10 +58,9 @@ tags:
 - **Constraint:** Muss lokal oder datenschutzkonform laufen (kein Cloud-Zwang laut Architektur)
 - **Priorität:** Niedrig (erst nach stabilem MVP)
 
-### KI-Voice-Filter für Picking-Liste
-- **Idee:** Picking-Liste per Sprachbefehl filtern ("Zeige nur Aufträge mit hoher Priorität", "Welche Aufträge müssen heute raus?")
-- **Voraussetzung:** Touch-Filter + NLU/Intent-Engine-Erweiterung
-- **Priorität:** Mittel
+### ~~KI-Voice-Filter für Picking-Liste~~ ✅ Erledigt 2026-03-23
+- **Umgesetzt:** Touch-Filter-Buttons + Voice-Intents `filter_high`, `filter_normal`, `status` in `intent_engine.py` und `app.js`.
+- **Proaktive Begrüßung** beim App-Start: Assistent spricht Anzahl offener + dringender Aufträge.
 
 ---
 
@@ -264,6 +263,18 @@ Nicht für den aktuellen Stand eingeplant:
 - selbstverändernde Claude-Regeln oder autonome Code-Evolution
 
 Diese Ideen bleiben interessant, sind für den jetzigen Bachelor-PoC aber bewusst nach hinten priorisiert.
+
+---
+
+### Audio-Feedback (Beep + Vibration) ✅ Erledigt 2026-03-23
+- **Umgesetzt:** `pwa/js/feedback.js` — Web Audio API, kein externes Asset.
+  - Scan-Erfolg → heller Doppel-Piep + kurze Vibration
+  - Scan-Fehler → tiefer Brummton + lange Vibration
+  - `feedbackAlert()` bereit für Eilauftrag-Alarm via n8n-Webhook (noch nicht verdrahtet)
+
+### Bestandsabfrage per Sprache ✅ Erledigt 2026-03-23
+- **Umgesetzt:** `GET /api/pickings/{id}/stock` — fragt `stock.quant` in Odoo ab.
+- **Intent:** `stock_query` ("noch da", "lagerbestand") → spricht verfügbare Menge an.
 
 ---
 

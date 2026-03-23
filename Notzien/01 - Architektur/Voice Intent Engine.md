@@ -95,6 +95,10 @@ stateDiagram-v2
 | `pause` | alle | pause, stopp, stop, halt | "pause" |
 | `done` | alle | fertig, abgeschlossen, ende | "fertig" |
 | `help` | alle | hilfe, help | "hilfe" |
+| `stock_query` | Detail (Picking offen) | noch da, im bestand, lagerbestand, bestand prüfen | "noch da?" |
+| `filter_high` | Liste | dringend, hohe priorität, eilig, kritisch | "dringend" |
+| `filter_normal` | Liste | alle, zurücksetzen, filter weg, reset | "alle" |
+| `status` | Liste | wie viele, status, übersicht, aufträge | "wie viele offen?" |
 | `unknown` | alle | — | Kein Match |
 
 ---
@@ -193,11 +197,16 @@ text = data.get("text", "").strip()
 | Konstante | Wert | Beschreibung |
 | --------- | ---- | ------------ |
 | `SPEECH_RMS` | 25 | RMS über 25 = Sprache (Rauschen liegt bei 5-15) |
-| `SILENCE_AFTER_SPEECH` | 700ms | Stille nach Sprache → Audio senden |
+| `SILENCE_AFTER_SPEECH` | 400ms | Stille nach Sprache → Audio senden (gesenkt von 700ms am 2026-03-23) |
 | `NO_SPEECH_TIMEOUT` | 6000ms | Keine Sprache erkannt → Zyklus neu starten |
 | `MIN_SPEECH_MS` | 150ms | Mindest-Sprechdauer (verhindert Artefakte) |
 | `MAX_RECORDING_MS` | 10000ms | Sicherheits-Timeout |
 | `CHECK_MS` | 30ms | Monitor-Intervall (setInterval) |
+
+> [!success] Update 2026-03-23
+> `SILENCE_AFTER_SPEECH` von 700ms auf 400ms gesenkt → ~300ms schnellere Reaktion pro Kommando.
+> Neue Intents hinzugefügt: `stock_query`, `filter_high`, `filter_normal`, `status`.
+> `stopVoiceMode()` exportiert — Voice-Modus stoppt jetzt automatisch beim Seitenwechsel.
 
 **TTS-Feedback-Loop-Prävention:**
 ```javascript
