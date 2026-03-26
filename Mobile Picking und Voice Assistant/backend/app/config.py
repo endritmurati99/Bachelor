@@ -11,8 +11,13 @@ class Settings(BaseSettings):
 
     whisper_url: str = "http://whisper:9000"
 
-    n8n_webhook_base: str = "http://n8n:5678/webhook"
+    n8n_webhook_base: str = "http://n8n:5678/n8n/webhook"
     n8n_webhook_secret: str = ""
+    n8n_sync_timeout_ms: int = 7000
+    n8n_callback_secret: str = ""
+    n8n_connect_timeout_ms: int = 1000
+    n8n_circuit_breaker_failures: int = 3
+    n8n_circuit_breaker_open_seconds: int = 60
 
     cors_origins: str = "https://localhost"
     log_level: str = "info"
