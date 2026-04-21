@@ -80,15 +80,20 @@ function renderOperationalPickCard({ move, productLabel, locationLabel, zoneLabe
                     <span class="pick-card__sku">${productSku}</span>
                     <span class="pick-card__barcode">Barcode: ${move.product_barcode || '-'}</span>
                 </div>
-                <div class="pick-card__quantity">${quantityLabel} Stück</div>
+                <div class="pick-card__quantity">${quantityLabel} Stueck</div>
             </div>
             <div class="pick-card__location-box">
                 <div class="pick-card__location-label">Platz</div>
                 <div class="pick-card__location">${locationLabel}</div>
             </div>
-            <button class="btn-confirm" data-line-id="${move.id}">
-                Bestätigen
-            </button>
+            <div class="pick-card__actions">
+                <button class="btn-confirm" data-line-id="${move.id}">
+                    Bestaetigen
+                </button>
+                <button class="btn-short-pick" data-line-id="${move.id}">
+                    Fehlbestand
+                </button>
+            </div>
         </section>
     `;
 }
@@ -96,7 +101,7 @@ function renderOperationalPickCard({ move, productLabel, locationLabel, zoneLabe
 export function renderPickCard(move) {
     const productLabel = move.ui_display || move.product_short_name || move.product_name || 'Produkt';
     const locationLabel = move.location_src_short || move.location_src || 'Lagerort';
-    const zoneLabel = move.location_src_zone || 'Nächster Platz';
+    const zoneLabel = move.location_src_zone || 'Naechster Platz';
     const quantity = Number(move.quantity_demand ?? 0);
     const quantityLabel = Number.isInteger(quantity)
         ? String(quantity)
@@ -116,7 +121,7 @@ export function renderLoading() {
         <div class="state-panel state-panel--loading" role="status" aria-live="polite">
             <div class="state-panel__eyebrow">Synchronisiert</div>
             <div class="state-panel__title">Lagerdaten werden vorbereitet</div>
-            <div class="state-panel__meta">Session, Profilstatus und offene Aufträge werden geladen.</div>
+            <div class="state-panel__meta">Session, Profilstatus und offene Auftraege werden geladen.</div>
             <div class="state-panel__track" aria-hidden="true">
                 <span class="state-panel__bar"></span>
             </div>
@@ -127,7 +132,7 @@ export function renderLoading() {
 export function renderError(message) {
     return `
         <div class="state-panel state-panel--error" role="alert">
-            <div class="state-panel__eyebrow">Störung</div>
+            <div class="state-panel__eyebrow">Stoerung</div>
             <div class="state-panel__title">Fehler</div>
             <div class="state-panel__meta">${escapeHtml(message)}</div>
         </div>
