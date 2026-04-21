@@ -21,12 +21,14 @@ import {
     getActivePicker,
     getCachedPickers,
     getDeviceId,
+    getLineStock,
     getPickers,
     getPickingDetail,
     getPickings,
     getStoredHighContrastEnabled,
     getStoredPreferredZone,
     getStoredSearchQuery,
+    requestReplenishment,
     releasePicking,
     setActivePicker,
     setCachedPickers,
@@ -68,6 +70,7 @@ const VOICE_ASSIST_SHORTAGE_RE = /\b(fehlt|fehlmenge|mangel|nachschub|leer|restb
 const DARK_THEME_COLOR = '#091014';
 const LIGHT_THEME_COLOR = '#F5F5F5';
 const LIFECYCLE_REFRESH_DEBOUNCE_MS = 900;
+const lineStockCache = new Map();
 
 function formatLocationForSpeech(locationPath) {
     if (!locationPath) return '';
@@ -321,9 +324,14 @@ const pendingRequestControllers = new Set();
 const mainEl = () => document.getElementById('main');
 const headerEl = () => document.getElementById('header');
 const statusEl = () => document.getElementById('status-indicator');
+const statusBtnEl = () => document.getElementById('status-btn');
+const statusDotEl = () => document.getElementById('status-dot');
 const voiceStatusEl = () => document.getElementById('voice-status-indicator');
 const pickerEl = () => document.getElementById('picker-indicator');
-const headerSearchEl = () => document.querySelector('.header-search');
+const pickerNameEl = () => document.getElementById('picker-name');
+const pickerAvatarEl = () => document.getElementById('picker-avatar');
+const greetingNameEl = () => document.getElementById('greeting-name');
+const searchRowEl = () => document.querySelector('.search-row');
 const searchInputEl = () => document.getElementById('search-input');
 const taskCounterEl = () => document.getElementById('task-counter');
 const filterChipsEl = () => document.getElementById('filter-chips');
@@ -462,7 +470,7 @@ function updateToolbar(view) {
     const searchInput = searchInputEl();
     const searchEnabled = view === 'list' || view === 'search_expanded';
     if (searchInput) searchInput.disabled = !searchEnabled;
-    headerSearchEl()?.toggleAttribute('hidden', !searchEnabled);
+    searchRowEl()?.toggleAttribute('hidden', !searchEnabled);
     filterRowEl()?.toggleAttribute('hidden', !searchEnabled);
     searchToggleEl()?.toggleAttribute('hidden', !searchEnabled);
     headerEl()?.classList.toggle('header--picker-only', view === 'profile_required');
@@ -473,13 +481,19 @@ function updatePickerIndicator() {
     if (!indicator) return;
     const picker = getState().currentPicker;
     if (picker?.name) {
-        indicator.textContent = picker.name;
+        const shortLabel = getPickerShortLabel(picker);
+        const firstName = picker.name.split(/\s+/)[0] || picker.name;
+        if (pickerNameEl()) pickerNameEl().textContent = picker.name;
+        if (pickerAvatarEl()) pickerAvatarEl().textContent = shortLabel;
+        if (greetingNameEl()) greetingNameEl().textContent = firstName;
         indicator.title = picker.name;
         indicator.setAttribute('aria-label', picker.name);
-        indicator.dataset.shortLabel = getPickerShortLabel(picker);
+        indicator.dataset.shortLabel = shortLabel;
         indicator.classList.remove('picker-indicator--empty');
     } else {
-        indicator.textContent = 'Profil';
+        if (pickerNameEl()) pickerNameEl().textContent = 'Profil wählen';
+        if (pickerAvatarEl()) pickerAvatarEl().textContent = 'PW';
+        if (greetingNameEl()) greetingNameEl().textContent = 'Picker';
         indicator.title = 'Profil wählen';
         indicator.setAttribute('aria-label', 'Profil wählen');
         indicator.dataset.shortLabel = '+';
@@ -496,6 +510,8 @@ function updateConnectivityStatus({ loading = false } = {}) {
         indicator.className = 'status status--sync';
         indicator.dataset.shortLabel = getStatusShortLabel('sync');
         indicator.title = 'Synchronisiert';
+        statusBtnEl()?.setAttribute('title', 'Synchronisiert');
+        statusDotEl()?.classList.remove('offline');
         return;
     }
 
@@ -504,6 +520,8 @@ function updateConnectivityStatus({ loading = false } = {}) {
         indicator.className = 'status online';
         indicator.dataset.shortLabel = getStatusShortLabel('online');
         indicator.title = 'Online';
+        statusBtnEl()?.setAttribute('title', 'Online');
+        statusDotEl()?.classList.remove('offline');
         return;
     }
 
@@ -511,6 +529,8 @@ function updateConnectivityStatus({ loading = false } = {}) {
     indicator.className = 'status offline';
     indicator.dataset.shortLabel = getStatusShortLabel('offline');
     indicator.title = 'Offline';
+    statusBtnEl()?.setAttribute('title', 'Offline');
+    statusDotEl()?.classList.add('offline');
 }
 
 function clearVoiceStatusReset() {
@@ -814,6 +834,24 @@ function renderListEmptyState(message, detail = 'Passe Suche oder Filter an, um 
 function renderQueueOverview(visiblePickings) {
     const urgentCount = visiblePickings.filter((picking) => picking.priority === '1').length;
     const pickerName = getState().currentPicker?.name || 'Kein Profil aktiv';
+    const activePicking = getState().currentPicking;
+
+    let ctaLabel, ctaId;
+    if (activePicking) {
+        ctaLabel = `Fortsetzen: ${escapeHtml(getPickingReference(activePicking))}`;
+        ctaId = activePicking.id;
+    } else if (urgentCount > 0) {
+        const firstUrgent = visiblePickings.find((p) => p.priority === '1');
+        ctaLabel = `Nächsten Prio-Pick starten (${urgentCount} dringend)`;
+        ctaId = firstUrgent?.id;
+    } else {
+        ctaLabel = 'Picking starten';
+        ctaId = visiblePickings[0]?.id;
+    }
+
+    const ctaHtml = ctaId
+        ? `<button id="queue-cta" class="btn-big btn-big--primary queue-cta" data-id="${ctaId}">${ctaLabel}</button>`
+        : '';
 
     return `
         <section class="queue-overview" aria-label="Arbeitsbereich">
@@ -834,6 +872,7 @@ function renderQueueOverview(visiblePickings) {
                     <span class="queue-stat__value">${searchQuery ? 'Aktiv' : 'Aus'}</span>
                 </div>
             </div>
+            ${ctaHtml}
         </section>
     `;
 }
@@ -948,6 +987,11 @@ function renderPickingsView(pickings) {
     mainEl().querySelectorAll('.pick-list-card[data-id]').forEach((card) => {
         card.addEventListener('click', () => loadPickingDetail(Number(card.dataset.id)));
     });
+
+    const ctaBtn = document.getElementById('queue-cta');
+    if (ctaBtn) {
+        ctaBtn.addEventListener('click', () => loadPickingDetail(Number(ctaBtn.dataset.id)));
+    }
 }
 
 function updateVoiceButtonState(active) {
@@ -1209,6 +1253,7 @@ async function switchProfile() {
     abortPendingRequests();
     stopSpeaking();
     closeOverlay();
+    lineStockCache.clear();
     stopClaimHeartbeat();
     if (isVoiceModeActive()) stopVoiceMode();
     btnVoice()?.classList.remove('nav-btn--ptt');
@@ -1229,6 +1274,7 @@ async function switchProfile() {
 async function loadPickingList({ skipRelease = false } = {}) {
     stopSpeaking();
     closeOverlay();
+    lineStockCache.clear();
     if (!skipRelease) await releaseCurrentClaim();
     updateToolbar('list');
 
@@ -1279,6 +1325,7 @@ async function setFilter(value) {
 async function loadPickingDetail(pickingId) {
     stopSpeaking();
     closeOverlay();
+    lineStockCache.clear();
     setMainContent(renderLoading());
 
     const pickerReady = await ensurePickerSelection();
@@ -1328,6 +1375,174 @@ async function loadPickingDetail(pickingId) {
     }
 }
 
+function getOutOfStockBanner(stockState) {
+    if (!stockState || stockState.status !== 'out_of_stock') return '';
+
+    const recommendation = stockState.recommendation;
+    const recommendationText = recommendation?.recommended_location
+        ? `Nachschub möglich aus ${recommendation.recommended_location}.`
+        : 'Kein Alternativbestand laut System gefunden.';
+
+    return `
+        <section class="state-panel state-panel--warning" aria-label="Position nicht erfüllbar">
+            <div class="state-panel__eyebrow">Nicht Erfüllbar</div>
+            <div class="state-panel__title">Kein Bestand am aktuellen Lagerplatz</div>
+            <div class="state-panel__meta">
+                Verfügbar: ${escapeHtml(formatQuantity(stockState.quantity_available))}. ${escapeHtml(recommendationText)}
+            </div>
+        </section>
+    `;
+}
+
+async function loadCurrentLineStockState(pickingId, line) {
+    try {
+        const stockState = await withManagedRequest((signal) => getLineStock(
+            pickingId,
+            line.product_id,
+            line.location_src_id,
+            { signal },
+        ));
+        lineStockCache.set(line.id, stockState);
+    } catch (error) {
+        if (isAbortError(error)) return;
+        console.warn('Bestandspruefung fehlgeschlagen:', error);
+        lineStockCache.set(line.id, {
+            status: 'unknown',
+            quantity_available: null,
+            recommendation: null,
+        });
+    }
+
+    const { currentPicking, currentLineIndex } = getState();
+    const currentLine = currentPicking?.move_lines?.[currentLineIndex];
+    if (!currentPicking || currentPicking.id !== pickingId || currentLine?.id !== line.id) return;
+
+    renderCurrentLine();
+    const stockState = lineStockCache.get(line.id);
+    if (stockState?.status === 'out_of_stock') {
+        showOutOfStockModal({ picking: currentPicking, line, stockState });
+    }
+}
+
+function ensureCurrentLineStockState(pickingId, line) {
+    const cached = lineStockCache.get(line.id);
+    if (cached) return cached;
+
+    const checkingState = {
+        status: 'checking',
+        quantity_available: null,
+        recommendation: null,
+    };
+    lineStockCache.set(line.id, checkingState);
+    void loadCurrentLineStockState(pickingId, line);
+    return checkingState;
+}
+
+function buildOutOfStockDescription(line) {
+    const location = line.location_src_short || formatLocationForDisplay(line.location_src);
+    return `Lagerfach leer. ${getLineDisplayName(line)} an ${location} nicht verfuegbar.`;
+}
+
+function showOutOfStockModal({ picking, line, stockState }) {
+    const overlay = overlayEl();
+    if (!overlay) return;
+
+    const recommendation = stockState?.recommendation;
+    const altText = recommendation?.recommended_location
+        ? `Nachschub möglich aus ${recommendation.recommended_location}.`
+        : 'Kein Alternativbestand laut System vorhanden.';
+
+    overlay.hidden = false;
+    overlay.innerHTML = `
+        <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="stockout-title">
+            <div class="modal-sheet__eyebrow">Exception Flow</div>
+            <h2 id="stockout-title" class="modal-sheet__title">Kein Bestand</h2>
+            <p class="modal-sheet__text">
+                Produkt: ${escapeHtml(getLineDisplayName(line))}<br>
+                Soll: ${escapeHtml(formatQuantity(line.quantity_demand))}<br>
+                Verfügbar: ${escapeHtml(formatQuantity(stockState?.quantity_available ?? 0))}
+            </p>
+            <p class="modal-sheet__text">${escapeHtml(altText)}</p>
+            <p id="stockout-inline-error" class="qa-inline-error" role="alert" hidden></p>
+            <div class="modal-sheet__actions modal-sheet__actions--stack">
+                <button type="button" id="stockout-report" class="picker-option picker-option--primary">Problem melden</button>
+                <button type="button" id="stockout-replenish" class="picker-option">Nachschub anfordern</button>
+                <button type="button" id="stockout-skip" class="picker-option">Überspringen</button>
+            </div>
+        </div>
+    `;
+
+    const setInlineError = (message) => {
+        const inlineErrorEl = document.getElementById('stockout-inline-error');
+        if (!inlineErrorEl) return;
+        inlineErrorEl.hidden = false;
+        inlineErrorEl.textContent = message;
+    };
+
+    document.getElementById('stockout-report')?.addEventListener('click', () => {
+        closeOverlay();
+        openQualityAlertForm({
+            initialDescription: buildOutOfStockDescription(line),
+            returnToListOnSuccess: true,
+        });
+    });
+
+    document.getElementById('stockout-replenish')?.addEventListener('click', async () => {
+        const replenishBtn = document.getElementById('stockout-replenish');
+        const skipBtn = document.getElementById('stockout-skip');
+        const reportBtn = document.getElementById('stockout-report');
+        if (replenishBtn) replenishBtn.disabled = true;
+        if (skipBtn) skipBtn.disabled = true;
+        if (reportBtn) reportBtn.disabled = true;
+
+        try {
+            const result = await withManagedRequest((signal) => requestReplenishment(
+                picking.id,
+                {
+                    move_line_id: line.id,
+                    reason: buildOutOfStockDescription(line),
+                },
+                {
+                    idempotencyKey: buildOperationKey('replenishment-request', [
+                        picking.id,
+                        line.id,
+                        stockState?.recommendation?.recommended_location_id || 'none',
+                    ]),
+                    signal,
+                },
+            ));
+
+            if (!result.success) {
+                if (replenishBtn) replenishBtn.disabled = false;
+                if (skipBtn) skipBtn.disabled = false;
+                if (reportBtn) reportBtn.disabled = false;
+                setInlineError(result.message || 'Nachschub konnte nicht angefordert werden.');
+                return;
+            }
+
+            closeOverlay();
+            showToast(result.message || 'Nachschub angefordert.', 'success');
+            await speak(result.message || 'Nachschub angefordert.');
+            await releaseCurrentClaim();
+            await loadPickingList({ skipRelease: true });
+        } catch (error) {
+            if (isAbortError(error)) return;
+            if (replenishBtn) replenishBtn.disabled = false;
+            if (skipBtn) skipBtn.disabled = false;
+            if (reportBtn) reportBtn.disabled = false;
+            setInlineError(error.message || 'Nachschub konnte nicht angefordert werden.');
+        }
+    });
+
+    document.getElementById('stockout-skip')?.addEventListener('click', async () => {
+        closeOverlay();
+        showToast('Position zur späteren Bearbeitung zurückgestellt.', 'warning');
+        await speak('Position zur späteren Bearbeitung zurückgestellt.');
+        await releaseCurrentClaim();
+        await loadPickingList({ skipRelease: true });
+    });
+}
+
 function renderCurrentLine() {
     const { currentPicking, currentLineIndex } = getState();
     if (!currentPicking) return;
@@ -1358,6 +1573,7 @@ function renderCurrentLine() {
     const detailPartner = currentPicking.partner_id ? currentPicking.partner_id[1] : 'Aktives Picking';
     const progressPercent = Math.round(((currentLineIndex + 1) / Math.max(lines.length, 1)) * 100);
     const kitName = getPickingKitName(currentPicking);
+    const stockState = ensureCurrentLineStockState(currentPicking.id, line);
     const detailHero = renderProductVisual({
         productId: line.product_id,
         label: detailProduct,
@@ -1403,6 +1619,7 @@ function renderCurrentLine() {
                 <div class="detail-summary__helper">Scanne den Artikel oder bestätige den Griff per Touch.</div>
             </section>
             ${renderRouteHint(currentPicking, currentLineIndex)}
+            ${getOutOfStockBanner(stockState)}
             ${currentPicking.has_pending_quality_ai ? '<div class="ai-pending-banner">KI analysiert Qualitätsfall</div>' : ''}
             ${renderPickCard({
                 ...line,
@@ -1413,7 +1630,31 @@ function renderCurrentLine() {
 
     const confirmButton = mainEl().querySelector('.btn-confirm');
     if (confirmButton) {
-        confirmButton.addEventListener('click', () => handleScan(line.product_barcode || ''));
+        const stockUnknown = !stockState || stockState.status === 'checking';
+        const lineBlocked = stockState?.status === 'out_of_stock';
+        confirmButton.disabled = stockUnknown || lineBlocked;
+        confirmButton.textContent = stockUnknown
+            ? 'Bestand wird geprüft...'
+            : lineBlocked
+                ? 'Nicht erfüllbar'
+                : 'Bestätigen';
+        if (!stockUnknown && !lineBlocked) {
+            confirmButton.addEventListener('click', () => handleScan(line.product_barcode || ''));
+        }
+    }
+
+    const shortageButton = mainEl().querySelector('.btn-short-pick');
+    if (shortageButton) {
+        shortageButton.addEventListener('click', () => {
+            if (stockState?.status === 'out_of_stock') {
+                showOutOfStockModal({ picking: currentPicking, line, stockState });
+                return;
+            }
+            openQualityAlertForm({
+                initialDescription: `Physisch kein Bestand gefunden. ${getLineDisplayName(line)} prüfen.`,
+                returnToListOnSuccess: true,
+            });
+        });
     }
 
     const scanArea = document.getElementById('scan-input-area');
@@ -1432,6 +1673,17 @@ async function handleScan(barcode) {
     if (currentLineIndex >= lines.length) return;
 
     const line = lines[currentLineIndex];
+    const stockState = lineStockCache.get(line.id);
+
+    if (stockState?.status === 'checking') {
+        showToast('Bestand wird noch geprueft.', 'warning');
+        return;
+    }
+
+    if (stockState?.status === 'out_of_stock') {
+        showOutOfStockModal({ picking: currentPicking, line, stockState });
+        return;
+    }
 
     if (barcode && line.product_barcode && barcode !== line.product_barcode) {
         feedbackError();
@@ -1463,6 +1715,13 @@ async function handleScan(barcode) {
 
         if (!result.success) {
             feedbackError();
+            if (result.blocked_reason === 'out_of_stock') {
+                const blockingState = result.stock_context || stockState || { status: 'out_of_stock', quantity_available: 0 };
+                lineStockCache.set(line.id, blockingState);
+                renderCurrentLine();
+                showOutOfStockModal({ picking: currentPicking, line, stockState: blockingState });
+                return;
+            }
             speak(result.message || 'Fehler beim Bestätigen.');
             showToast(result.message || 'Fehler', 'error');
             return;
@@ -1600,6 +1859,13 @@ async function handleVoiceIntent(result) {
             if (line) speak(getLineSpeechPrompt(line));
             break;
         case 'problem':
+            if (line) {
+                const stockState = lineStockCache.get(line.id);
+                if (stockState?.status === 'out_of_stock' || VOICE_ASSIST_SHORTAGE_RE.test(result.text || '')) {
+                    showOutOfStockModal({ picking: currentPicking, line, stockState: stockState || { status: 'out_of_stock', quantity_available: 0 } });
+                    break;
+                }
+            }
             openQualityAlertForm();
             break;
         case 'photo':
@@ -1658,7 +1924,6 @@ async function handleVoiceIntent(result) {
 function shouldUseVoiceAssist(result, currentPicking) {
     if (!result?.text) return false;
     if (result.intent === 'stock_query' || result.intent === 'unknown') return true;
-    if (result.intent === 'problem' && VOICE_ASSIST_SHORTAGE_RE.test(result.text)) return true;
     if (!currentPicking && result.intent === 'help') return false;
     return false;
 }
@@ -1695,7 +1960,7 @@ async function maybeHandleVoiceAssist(result, currentPicking, currentLineIndex) 
     return true;
 }
 
-function openQualityAlertForm() {
+function openQualityAlertForm({ initialDescription = '', returnToListOnSuccess = false } = {}) {
     stopSpeaking();
     updateToolbar('alert');
 
@@ -1712,6 +1977,16 @@ function openQualityAlertForm() {
                 <div class="qa-header">
                     <h2 id="qa-title" class="qa-title">Problem melden</h2>
                     <p class="qa-context">${escapeHtml(contextLabel)}</p>
+                </div>
+
+                <div class="qa-field-group">
+                    <label for="qa-description" class="qa-label">Schnellauswahl</label>
+                    <div class="qa-chips" role="group" aria-label="Problem-Kategorie">
+                        <button type="button" class="qa-chip" data-chip="Verpackung defekt">Verpackung defekt</button>
+                        <button type="button" class="qa-chip" data-chip="Artikel beschädigt">Artikel beschädigt</button>
+                        <button type="button" class="qa-chip" data-chip="Menge falsch">Menge falsch</button>
+                        <button type="button" class="qa-chip" data-chip="Sonstiges">Sonstiges</button>
+                    </div>
                 </div>
 
                 <div class="qa-field-group">
@@ -1752,6 +2027,21 @@ function openQualityAlertForm() {
     const photoArea = document.getElementById('photo-area');
     const descriptionEl = document.getElementById('qa-description');
     const descriptionErrorEl = document.getElementById('qa-description-error');
+
+    if (initialDescription) {
+        descriptionEl.value = initialDescription;
+    }
+
+    // Quick-Select Chips: toggle active state + update textarea
+    document.querySelectorAll('.qa-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            chip.classList.toggle('qa-chip--active');
+            const activeChips = [...document.querySelectorAll('.qa-chip--active')]
+                .map(c => c.dataset.chip);
+            descriptionEl.value = activeChips.join(', ');
+            clearDescriptionError?.();
+        });
+    });
     const inlineErrorEl = document.getElementById('qa-inline-error');
     const cancelBtn = document.getElementById('qa-cancel');
     const submitBtn = document.getElementById('qa-submit');
@@ -1847,6 +2137,10 @@ function openQualityAlertForm() {
     });
 
     cancelBtn.addEventListener('click', () => {
+        if (returnToListOnSuccess) {
+            loadPickingList();
+            return;
+        }
         if (currentPicking) {
             loadPickingDetail(currentPicking.id);
             return;
@@ -1897,6 +2191,11 @@ function openQualityAlertForm() {
             ));
             speak('Problem gemeldet. Die KI-Bewertung läuft.');
             showToast(`Alert ${result.name} erstellt - KI-Bewertung läuft...`, 'success');
+            if (returnToListOnSuccess) {
+                await releaseCurrentClaim();
+                await loadPickingList({ skipRelease: true });
+                return;
+            }
             if (currentPicking) {
                 await loadPickingDetail(currentPicking.id);
                 return;
