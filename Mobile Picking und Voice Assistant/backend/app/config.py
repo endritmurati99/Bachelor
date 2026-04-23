@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     odoo_password: str = ""
 
     whisper_url: str = "http://whisper:9000"
+    piper_url: str = "http://piper:5500"
 
     n8n_webhook_base: str = "http://n8n:5678/webhook"
     n8n_webhook_path_quality_alert_created: str = "quality-alert-created"

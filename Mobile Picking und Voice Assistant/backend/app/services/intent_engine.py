@@ -37,8 +37,8 @@ class Intent:
 
 
 EXACT_MATCH_CONFIDENCE = 0.95
-FUZZY_SINGLE_THRESHOLD = 0.78
-FUZZY_PHRASE_THRESHOLD = 0.72
+FUZZY_SINGLE_THRESHOLD = 0.73
+FUZZY_PHRASE_THRESHOLD = 0.68
 
 GERMAN_NUMBERS = {
     "null": "0",
@@ -61,6 +61,7 @@ CONFIRM_NEGATABLE_TERMS = ("stimmt", "richtig", "passt")
 
 PRIORITY_ORDER = (
     "problem",
+    "confirm_all",
     "confirm",
     "next",
     "previous",
@@ -76,6 +77,26 @@ PRIORITY_ORDER = (
 )
 
 ALIASES = {
+    "confirm_all": (
+        "alles bestaetigen",
+        "alle bestaetigen",
+        "komplett bestaetigen",
+        "alle positionen bestaetigen",
+        "auftrag komplett",
+        "auftrag abschliessen",
+        "alles erledigt",
+        "alle erledigt",
+        "alle durch",
+        "alles durch",
+        "komplett",
+        "alle auf einmal",
+        "alles auf einmal",
+        "bestaetige alles",
+        "bestaetige alle",
+        "bestaetige den auftrag",
+        "auftrag fertig",
+        "auftrag abschliessen",
+    ),
     "confirm": (
         "bestaetigen",
         "bestaetige",
@@ -84,6 +105,30 @@ ALIASES = {
         "ok",
         "okay",
         "check",
+        # natural affirmations
+        "jep",
+        "jup",
+        "jo",
+        "joa",
+        "jupp",
+        "klar",
+        "gut",
+        "passt",
+        "stimmt",
+        "richtig",
+        "genau",
+        "jawohl",
+        "sicher",
+        "alles klar",
+        "geht klar",
+        "in ordnung",
+        "perfekt",
+        "super",
+        "alles gut",
+        "fine",
+        "yep",
+        "yes",
+        "mhm",
     ),
     "next": (
         "weiter",
@@ -93,6 +138,21 @@ ALIASES = {
         "naechstes",
         "skip",
         "ueberspringen",
+        # additional navigation commands
+        "vor",
+        "vorwarts",
+        "continue",
+        "next",
+        "go",
+        "los",
+        "komm",
+        "geh weiter",
+        "mach weiter",
+        "weiter so",
+        "weiter gehts",
+        "naechste position",
+        "naechste zeile",
+        "und weiter",
     ),
     "previous": (
         "zuruck",
@@ -112,6 +172,14 @@ ALIASES = {
         "passt nicht",
         "stimmt nicht",
         "nicht richtig",
+        # additional problem terms
+        "verkehrt",
+        "nicht in ordnung",
+        "was stimmt nicht",
+        "da stimmt was nicht",
+        "falscher artikel",
+        "falsche menge",
+        "beschadigung",
     ),
     "photo": (
         "foto",
@@ -127,6 +195,13 @@ ALIASES = {
         "noch mal",
         "wie bitte",
         "was",
+        # additional repeat commands
+        "bitte",
+        "nochmals",
+        "kannst du wiederholen",
+        "hab nicht verstanden",
+        "nicht verstanden",
+        "sag das nochmal",
     ),
     "pause": (
         "pause",
@@ -135,6 +210,14 @@ ALIASES = {
         "halt",
         "warten",
         "moment",
+        # additional pause commands
+        "abbrechen",
+        "aufhoren",
+        "genug",
+        "schluss",
+        "kurze pause",
+        "sekunde",
+        "einen moment",
     ),
     "done": (
         "fertig",
@@ -143,6 +226,14 @@ ALIASES = {
         "ende",
         "beenden",
         "komplett",
+        # additional done expressions
+        "bin fertig",
+        "alles erledigt",
+        "alles fertig",
+        "komplett fertig",
+        "geschafft",
+        "durch",
+        "alles durch",
     ),
     "help": (
         "hilfe",
@@ -188,12 +279,24 @@ ALIASES = {
 }
 
 REGEX_PATTERNS = {
+    "confirm_all": (
+        r"\b(alles bestaetigen|alle bestaetigen|komplett bestaetigen)\b",
+        r"\b(alle positionen bestaetigen|auftrag komplett|auftrag abschliessen)\b",
+        r"\b(alles erledigt|alle erledigt|alle durch|alles durch)\b",
+        r"\b(alle auf einmal|alles auf einmal|bestaetige alles|bestaetige alle)\b",
+        r"\b(bestaetige den auftrag|auftrag fertig|komplett fertig)\b",
+    ),
     "confirm": (
         r"\b(bestaetigt|bestaetige|bestaetigen|ja|ok|okay|check)\b",
+        r"\b(jep|jup|jo|joa|jupp|klar|gut|passt|stimmt|richtig|genau|jawohl|sicher)\b",
+        r"\b(alles klar|geht klar|in ordnung|perfekt|super|alles gut)\b",
+        r"\b(fine|yep|yes|mhm)\b",
     ),
     "next": (
         r"\b(naechster|naechste|naechstes|weiter|weitermachen|skip|ueberspringen)\b",
-        r"\b(naechste position|naechste zeile|mach weiter)\b",
+        r"\b(naechste position|naechste zeile|mach weiter|geh weiter)\b",
+        r"\b(vor|vorwarts|continue|next|forward|los|go|komm)\b",
+        r"\b(und weiter|weiter gehts|weitergehts|weiter so)\b",
     ),
     "previous": (
         r"\b(zuruck|davor|eins zuruck|schritt zuruck)\b",
@@ -202,6 +305,7 @@ REGEX_PATTERNS = {
         r"\b(problem|fehler|defekt|beschaedigt|kaputt|fehlt|mangel)\b",
         r"\b(falsch|stimmt nicht|nicht richtig|verkehrt|passt nicht)\b",
         r"\b(falsche menge|falsches produkt|falscher artikel)\b",
+        r"\b(nicht in ordnung|da stimmt was nicht|was stimmt nicht|beschadigung)\b",
     ),
     "photo": (
         r"\b(foto|photo|bild|kamera|aufnahme|fotografieren)\b",
@@ -209,16 +313,19 @@ REGEX_PATTERNS = {
     ),
     "repeat": (
         r"\b(wiederholen|nochmal|noch mal|wie bitte)\b",
-        r"\b(sag nochmal|bitte was|nicht verstanden)\b",
+        r"\b(sag nochmal|bitte was|nicht verstanden|hab nicht verstanden)\b",
+        r"\b(nochmals|sag das nochmal|kannst du wiederholen)\b",
         r"^was$",
     ),
     "pause": (
         r"\b(pause|stopp|stop|halt|warten|moment)\b",
-        r"\b(warte mal|warte kurz|sekunde)\b",
+        r"\b(warte mal|warte kurz|sekunde|einen moment)\b",
+        r"\b(abbrechen|aufhoren|genug|schluss|kurze pause)\b",
     ),
     "done": (
         r"\b(fertig|erledigt|abgeschlossen|ende|beenden|komplett)\b",
         r"\b(bin fertig|alles erledigt|alles fertig)\b",
+        r"\b(komplett fertig|geschafft|durch|alles durch)\b",
     ),
     "help": (
         r"\b(hilfe|help|befehle|kommandos)\b",

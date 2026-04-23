@@ -1,16 +1,18 @@
 """
-Voice endpoints: server-side Whisper STT plus deterministic intent parsing.
+Voice endpoints: server-side Whisper STT, deterministic intent parsing, Piper TTS.
 """
 import logging
 import time
 from typing import Any
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi.responses import Response
 
 from app.dependencies import get_n8n_client, get_odoo_client, get_picking_service, get_write_request_context
 from app.models.n8n import VoiceAssistRequest, VoiceAssistResponse
+from app.models.voice import TTSRequest
 from app.services.obsidian_context import format_obsidian_hits, search_obsidian_notes
-from app.services import whisper_client
+from app.services import piper_client, whisper_client
 from app.services.intent_engine import (
     FUZZY_PHRASE_THRESHOLD,
     FUZZY_SINGLE_THRESHOLD,
@@ -28,7 +30,7 @@ from app.utils.audio import convert_to_wav
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
-_LOCAL_ONLY_ASSIST_INTENTS = {"confirm", "next", "previous", "done", "pause", "photo"}
+_LOCAL_ONLY_ASSIST_INTENTS = {"confirm", "confirm_all", "next", "previous", "done", "pause", "photo"}
 _SHORTAGE_TERMS = ("fehlt", "fehlmenge", "mangel", "restbestand", "nachschub", "leer")
 
 
@@ -484,3 +486,16 @@ async def assist_voice(
         round((time.monotonic() - started_at) * 1000),
     )
     return VoiceAssistResponse(**reply.asdict())
+
+
+@router.post("/voice/tts")
+async def synthesize_speech(body: TTSRequest):
+    """
+    Synthesisiert Text via lokalem Piper-TTS-Service zu WAV-Audio.
+    Gibt 503 zurueck wenn Piper nicht erreichbar — die PWA faellt dann
+    automatisch auf Browser-TTS zurueck.
+    """
+    audio = await piper_client.synthesize(body.text, body.lang)
+    if audio is None:
+        raise HTTPException(status_code=503, detail="TTS-Service nicht erreichbar")
+    return Response(content=audio, media_type="audio/wav")

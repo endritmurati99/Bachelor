@@ -69,6 +69,7 @@ services:
     depends_on:
       - odoo
       - whisper
+      - piper
     environment:
       ODOO_URL: http://odoo:8069
       ODOO_DB: ${ODOO_DB:-picking}
@@ -76,6 +77,7 @@ services:
       ODOO_API_KEY: ${ODOO_API_KEY:-}
       ODOO_PASSWORD: ${ODOO_PASSWORD:-}
       WHISPER_URL: http://whisper:9000
+      PIPER_URL: http://piper:5500
       N8N_WEBHOOK_BASE: http://n8n:5678/webhook
       N8N_WEBHOOK_PATH_QUALITY_ALERT_CREATED: ${N8N_WEBHOOK_PATH_QUALITY_ALERT_CREATED:-quality-alert-created}
       N8N_WEBHOOK_PATH_VOICE_EXCEPTION_QUERY: ${N8N_WEBHOOK_PATH_VOICE_EXCEPTION_QUERY:-voice-exception-query}
@@ -103,6 +105,15 @@ services:
     environment:
       ASR_MODEL: small
       ASR_ENGINE: faster_whisper
+    networks:
+      - picking-net
+
+  # ── Piper TTS Server (Deutsch, thorsten-high) ───────────────
+  piper:
+    build:
+      context: ./piper
+      dockerfile: Dockerfile
+    restart: unless-stopped
     networks:
       - picking-net
 

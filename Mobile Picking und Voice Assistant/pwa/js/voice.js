@@ -27,10 +27,10 @@ let cooldownTimer = null;
 let ttsBusy = false;
 let voiceState = VOICE_STATES.IDLE;
 
-const SPEECH_RMS = 25;
+const SPEECH_RMS = 18;
 const SILENCE_AFTER_SPEECH = 300;
 const NO_SPEECH_TIMEOUT = 6000;
-const MIN_SPEECH_MS = 150;
+const MIN_SPEECH_MS = 100;
 const MAX_RECORDING_MS = 10000;
 const CHECK_MS = 30;
 
@@ -53,6 +53,11 @@ let _pendingConfirmAction = null;
 let _pendingConfirmValue = null;
 
 let cachedDeVoice = null;
+
+// Piper TTS health-state: null=unbekannt, true=verfuegbar, false=nicht erreichbar.
+// Wird beim ersten speak()-Aufruf ermittelt und dann gecacht.
+let _piperHealthy = null;
+let _currentPiperAudio = null;
 
 function _resetConfirmationState() {
     _pendingConfirmAction = null;
@@ -231,13 +236,79 @@ function beginSpeechInterlock(promptText) {
     setVoiceState('tts-start', { voiceModeActive });
 }
 
-export function speak(text) {
-    return new Promise((resolve) => {
-        if (!('speechSynthesis' in window)) {
-            resolve();
-            return;
+/**
+ * Versucht Text via Backend-Piper-TTS abzuspielen.
+ * Gibt true zurueck bei Erfolg, false bei Fehler/Unavailability.
+ * Cacht den Verfuegbarkeitsstatus um wiederholte Timeouts zu vermeiden.
+ */
+async function _tryPiper(text) {
+    if (_piperHealthy === false) return false;
+
+    try {
+        const controller = new AbortController();
+        // 5s Timeout — laengere Saetze koennen 2-4s Synthesezeit brauchen.
+        // Kein permanentes Disable bei Timeout — nur bei echten Server-Fehlern.
+        const timerId = window.setTimeout(() => controller.abort(), 5000);
+
+        const response = await fetch('/api/voice/tts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text, lang: 'de-DE' }),
+            signal: controller.signal,
+        });
+        window.clearTimeout(timerId);
+
+        if (!response.ok) {
+            // Server-Fehler (4xx/5xx): Service ist down → permanent deaktivieren
+            _piperHealthy = false;
+            return false;
         }
 
+        const blob = await response.blob();
+        _piperHealthy = true;
+
+        return new Promise((resolve) => {
+            const url = URL.createObjectURL(blob);
+            const audio = new Audio(url);
+            _currentPiperAudio = audio;
+            const cleanup = (success) => {
+                _currentPiperAudio = null;
+                URL.revokeObjectURL(url);
+                resolve(success);
+            };
+            audio.onended = () => cleanup(true);
+            // Audio-Fehler: Blob-Format-Problem — retry naechstes Mal
+            audio.onerror = () => cleanup(false);
+            audio.play().catch(() => cleanup(false));
+        });
+    } catch {
+        // Netzwerkfehler / Timeout: Status auf null setzen → naechstes Mal retry
+        _piperHealthy = null;
+        return false;
+    }
+}
+
+function _speakBrowserTTS(text, done) {
+    if (!('speechSynthesis' in window)) {
+        done();
+        return;
+    }
+    window.speechSynthesis.cancel();
+    window.setTimeout(() => {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'de-DE';
+        utterance.rate = 1.15;
+        utterance.pitch = 1.0;
+        const voice = cachedDeVoice || loadBestDeVoice();
+        if (voice) utterance.voice = voice;
+        utterance.onend = done;
+        utterance.onerror = done;
+        window.speechSynthesis.speak(utterance);
+    }, 80);
+}
+
+export function speak(text) {
+    return new Promise((resolve) => {
         if (!ttsUnlocked) {
             pendingSpeech = text;
             resolve();
@@ -245,34 +316,32 @@ export function speak(text) {
         }
 
         beginSpeechInterlock(text);
-        window.speechSynthesis.cancel();
 
-        window.setTimeout(() => {
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'de-DE';
-            utterance.rate = 1.15;
-            utterance.pitch = 1.0;
+        const done = () => {
+            ttsBusy = false;
+            lastTtsEndedAt = Date.now();
+            enterCooldown();
+            resolve();
+        };
 
-            const voice = cachedDeVoice || loadBestDeVoice();
-            if (voice) utterance.voice = voice;
-
-            const done = () => {
-                ttsBusy = false;
-                lastTtsEndedAt = Date.now();
-                enterCooldown();
-                resolve();
-            };
-
-            utterance.onend = done;
-            utterance.onerror = done;
-            window.speechSynthesis.speak(utterance);
-        }, 80);
+        _tryPiper(text).then((piperOk) => {
+            if (piperOk) {
+                done();
+            } else {
+                _speakBrowserTTS(text, done);
+            }
+        });
     });
 }
 
 export function stopSpeaking() {
-    if (!('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
+    if (_currentPiperAudio) {
+        _currentPiperAudio.pause();
+        _currentPiperAudio = null;
+    }
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+    }
     if (!ttsBusy) return;
     ttsBusy = false;
     lastTtsEndedAt = Date.now();

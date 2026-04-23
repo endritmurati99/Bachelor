@@ -272,11 +272,8 @@ function getLineSpeechPrompt(line) {
     if (line.voice_instruction_short) return line.voice_instruction_short;
     const locationShort = line.location_src_short || formatLocationForSpeech(line.location_src);
     const product = getLineDisplayName(line);
-    return [
-        locationShort ? `${locationShort}.` : '',
-        `${formatQuantity(line.quantity_demand)} Stück.`,
-        product ? `${product}.` : '',
-    ].filter(Boolean).join(' ');
+    const parts = [locationShort, `${formatQuantity(line.quantity_demand)} Stück`, product].filter(Boolean);
+    return parts.join(', ');
 }
 
 function renderRouteHint(picking, currentLineIndex) {
@@ -1590,6 +1587,10 @@ function renderPickerSelection(
             setActivePicker(picker);
             setState({ currentPicker: picker, deviceId: getDeviceId() });
             updatePickerIndicator();
+            const firstName = picker.name?.split(/\s+/)[0] || picker.name || '';
+            const hour = new Date().getHours();
+            const salutation = hour < 12 ? 'Guten Morgen' : hour < 18 ? 'Guten Tag' : 'Guten Abend';
+            speak(`${salutation} ${firstName}.`);
             await loadPickingList({ skipRelease: true });
         });
     });
@@ -1962,7 +1963,7 @@ function showOutOfStockModal({ picking, line, stockState }) {
     document.getElementById('stockout-skip')?.addEventListener('click', async () => {
         closeOverlay();
         showToast('Position zur späteren Bearbeitung zurückgestellt.', 'warning');
-        await speak('Position zur späteren Bearbeitung zurückgestellt.');
+        await speak('Übersprungen.');
         await releaseCurrentClaim();
         await loadPickingList({ skipRelease: true });
     });
@@ -2225,7 +2226,7 @@ async function handleScan(barcode) {
 
         if (result.picking_complete) {
             await releaseCurrentClaim();
-            speak('Auftrag abgeschlossen.');
+            speak('Fertig.');
             setState({ currentLineIndex: lines.length });
             renderResponsiveCurrentLine();
         } else {
@@ -2243,13 +2244,13 @@ async function handleScan(barcode) {
             claimedPickingId = null;
             stopClaimHeartbeat();
             renderClaimConflict(error.detail, currentPicking.id);
-            speak('Dieses Picking wurde inzwischen von jemand anderem übernommen.');
+            speak('Schon vergeben.');
             return;
         }
         if (isAbortError(error)) return;
 
         showToast(error.message || 'Verbindungsfehler', 'error');
-        speak('Verbindungsfehler. Bitte erneut versuchen.');
+        speak('Verbindungsfehler.');
     }
 }
 
@@ -2294,6 +2295,67 @@ async function finishVoiceLongPress() {
     await stopPushToTalk();
 }
 
+/**
+ * Bestätigt alle verbleibenden Pick-Positionen auf einmal.
+ * Ruft confirm-line fuer jede offene Linie sequenziell auf.
+ */
+async function handleConfirmAll(picking, lines, startIndex) {
+    const remaining = lines.slice(startIndex);
+    if (!remaining.length) {
+        speak('Alle Positionen bereits erledigt.');
+        return;
+    }
+
+    speak(`${remaining.length} ${remaining.length === 1 ? 'Position' : 'Positionen'} werden bestätigt.`);
+    showToast(`Bestätige ${remaining.length} Positionen...`, 'info');
+
+    let confirmedCount = 0;
+    for (const [offset, pickLine] of remaining.entries()) {
+        const lineIdx = startIndex + offset;
+        try {
+            const result = await withManagedRequest((signal) => confirmLine(
+                picking.id,
+                {
+                    move_line_id: pickLine.id,
+                    scanned_barcode: pickLine.product_barcode || '',
+                    quantity: pickLine.quantity_demand,
+                },
+                {
+                    idempotencyKey: buildOperationKey('confirm-all', [
+                        picking.id,
+                        pickLine.id,
+                        lineIdx,
+                        pickLine.quantity_demand,
+                    ]),
+                    signal,
+                },
+            ));
+
+            if (!result.success) {
+                speak(`Position ${offset + 1} konnte nicht bestätigt werden.`);
+                showToast(result.message || 'Fehler bei Bulk-Bestätigung', 'error');
+                return;
+            }
+
+            confirmedCount += 1;
+            setState({ currentLineIndex: lineIdx + 1 });
+            renderResponsiveCurrentLine();
+
+            if (result.picking_complete) break;
+        } catch (error) {
+            if (isAbortError(error)) return;
+            speak('Verbindungsfehler.');
+            showToast(error.message || 'Verbindungsfehler', 'error');
+            return;
+        }
+    }
+
+    await releaseCurrentClaim();
+    speak('Alles erledigt.');
+    setState({ currentLineIndex: lines.length });
+    renderResponsiveCurrentLine();
+}
+
 async function handleVoiceIntent(result) {
     const classification = classifyVoiceResult(result);
     if (classification.kind === 'error') {
@@ -2329,6 +2391,9 @@ async function handleVoiceIntent(result) {
     const line = lines[currentLineIndex];
 
     switch (result.intent) {
+        case 'confirm_all':
+            if (currentPicking) await handleConfirmAll(currentPicking, lines, currentLineIndex);
+            break;
         case 'confirm':
             if (line) await handleScan(line.product_barcode || '');
             break;
@@ -2373,7 +2438,7 @@ async function handleVoiceIntent(result) {
         case 'done': {
             const remaining = Math.max(lines.length - currentLineIndex - 1, 0);
             if (remaining === 0) {
-                await speak('Auftrag abgeschlossen.');
+                await speak('Fertig.');
                 loadPickingList();
             } else {
                 speak(`Noch ${remaining} Artikel ausstehend.`);
@@ -2381,19 +2446,19 @@ async function handleVoiceIntent(result) {
             break;
         }
         case 'help':
-            speak('Kommandos: bestätigen, weiter, zurück, wiederholen, Problem, fertig.');
+            speak('Sag bestätigen, weiter, zurück, Problem oder fertig.');
             break;
         case 'filter_high':
             if (currentPicking !== null) break;
             activeFilter = 'high';
             await loadPickingList({ skipRelease: true });
-            speak('Gefiltert. Zeige nur dringende Aufträge.');
+            speak('Nur Dringendes.');
             break;
         case 'filter_normal':
             if (currentPicking !== null) break;
             activeFilter = DEFAULT_FILTER;
             await loadPickingList({ skipRelease: true });
-            speak('Filter zurückgesetzt. Alle Aufträge.');
+            speak('Alle Aufträge.');
             break;
         case 'status': {
             if (currentPicking !== null) break;
