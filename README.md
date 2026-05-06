@@ -1,127 +1,92 @@
-# Mobile Picking und Voice Assistant
+# Mobile Picking And Voice Assistant
 
-Bachelorarbeit-PoC fuer einen hybriden, sprachgestuetzten mobilen Picking-Assistenten auf Basis von Odoo 18 Community, FastAPI, n8n und einer PWA.
+Mobile Picking And Voice Assistant is a warehouse picking proof of concept that combines an Odoo 18 backend, a FastAPI application layer, a mobile PWA, local voice recognition, and n8n-based exception workflows.
 
-## Aktueller Stand
+## Current Status
 
-- Odoo bleibt System of Record
-- FastAPI bleibt die einzige App-API fuer die PWA
-- n8n bleibt Orchestrator fuer async Events und synchrone Ausnahmeassistenz
-- Whisper laeuft lokal als ASR-Service; der normale Voice-Pfad bleibt ohne n8n
-- Welle A fuer die Quality-Alert-KI-Bewertung ist im Repo umgesetzt
-- Phase A-C fuer kontrollierte Inbetriebnahme, neutrales Integrations-Logging und Telemetrie-Export ist im Repo vorbereitet
+The repository represents a bachelor-thesis PoC for assisted mobile picking. The current implementation includes the Wave A quality-alert AI evaluation path, controlled n8n workflow rollout scripts, a PWA for scanner/voice/touch flows, FastAPI routes, Odoo customizations, and Playwright/backend tests.
 
-## Welle A: Quality Alert KI-Bewertung
+The project keeps Odoo as the system of record. FastAPI is the only app-facing API for the PWA, n8n handles asynchronous or exception workflows, and touch input remains the operational fallback when voice is unavailable.
 
-Diese Welle war bewusst klein und technisch risikoarm.
+## Key Capabilities
 
-Umgesetzt:
+- Mobile picking list and picking-line confirmation through the PWA.
+- Soft claiming, heartbeats, idempotent mutation requests, and barcode/touch/voice confirmation paths.
+- Local voice hot path through `POST /api/voice/recognize`.
+- Synchronous exception assistance through `POST /api/voice/assist`.
+- Quality alert creation with controlled n8n handoff and structured Odoo writeback.
+- Integration logging and telemetry export for staged rollout windows.
 
-- Odoo-UI der Tab `KI-Bewertung` bereinigt
-- Odoo-Datenmodell minimal erweitert um:
-  - `ai_enhanced_description`
-  - `ai_photo_analysis`
-- internen Writeback-Vertrag fuer `quality-assessment` erweitert
-- Klartext-Chatter fuer KI-Writebacks eingefuehrt
-- `n8n/workflows/quality-alert-created.json` minimal erweitert
-- Heuristik-Fallback beibehalten
-
-Nicht Teil von Welle A:
-
-- keine mobile Diktierfunktion
-- kein `draft-enhancement`
-- keine echte Vision-Pipeline
-- kein OpenAI-Zwang
-- keine neue Quality-Alert-Bedienlogik in der PWA
-
-## Kernfunktionen
-
-### Picking
-- offene Pickings in der PWA
-- Soft Claiming mit Heartbeats
-- Idempotency fuer mutierende Requests
-- Barcode-, Touch- und Voice-Bestaetigung
-- Route-Plan fuer offene Pick-Positionen
-
-### Voice
-- `POST /api/voice/recognize` fuer lokalen Voice-Hot-Path
-- `POST /api/voice/assist` fuer synchrone Ausnahmeassistenz
-- Odoo- und Obsidian-Kontext koennen in Ausnahmefaellen angereichert werden
-
-### Quality Alerts
-- `POST /api/quality-alerts` akzeptiert Beschreibung, Kontext und optional mehrere Fotos
-- Alerts werden zuerst in Odoo erstellt; `ai_evaluation_status = pending` wird nur gesetzt, wenn `quality-alert-created` erfolgreich an n8n uebergeben wurde
-- wenn die n8n-Uebergabe scheitert, bleibt der Alert sichtbar, wird aber auf `failed` markiert und im Chatter begruendet
-- n8n bewertet den Alert asynchron und schreibt kontrolliert ueber FastAPI zurueck
-- Odoo zeigt im Hauptblock `Systembewertung` nur:
-  - Analyse-Status
-  - Einstufung
-  - Empfohlene Aktion
-  - Analysiert am
-
-## Architektur in Kurzform
+## Architecture
 
 ```text
 PWA -> Caddy -> FastAPI -> Odoo
-                |-> Whisper
-                `-> n8n
-n8n -> interne FastAPI-Callbacks -> Odoo
+                |-> local ASR service
+                `-> n8n workflows
+
+n8n -> internal FastAPI callbacks -> Odoo
 ```
 
-## Wichtige Endpunkte
+Core rules:
 
-| Methode | Pfad | Zweck |
-| ------- | ---- | ----- |
-| `GET` | `/api/pickers` | aktive Odoo-Picker |
-| `GET` | `/api/pickings` | offene Pickings |
-| `POST` | `/api/pickings/{id}/confirm-line` | Pick bestaetigen |
-| `POST` | `/api/quality-alerts` | Quality Alert anlegen |
-| `POST` | `/api/voice/recognize` | Transkript + Intent |
-| `POST` | `/api/voice/assist` | synchrone Ausnahmeassistenz |
-| `POST` | `/api/internal/n8n/quality-assessment` | Quality-Writeback |
-| `POST` | `/api/internal/n8n/replenishment-action` | Replenishment-Writeback |
-| `POST` | `/api/integration/log` | neutrales Integrations-/Audit-Logging fuer n8n |
+- Odoo remains the system of record.
+- FastAPI owns validation, idempotency, Odoo adaptation, and PWA-facing contracts.
+- n8n does not sit in the normal voice hot path.
+- n8n writes back only through internal FastAPI callbacks.
+- Voice is an enhancement; touch remains the fallback.
 
-## Wichtige Dokumente
+Useful docs:
 
-- `docs/ARCHITECTURE.md`
-- `docs/QUALITY_ALERT_AI_FIELDS.md`
-- `docs/N8N_CONTRACT_FREEZE_V1.md`
-- `../Notzien/03 - Features/Welle A - Quality Alert KI Bewertung.md`
+- [Architecture](Mobile%20Picking%20und%20Voice%20Assistant/docs/ARCHITECTURE.md)
+- [Setup](Mobile%20Picking%20und%20Voice%20Assistant/docs/SETUP.md)
+- [Voice Commands](Mobile%20Picking%20und%20Voice%20Assistant/docs/VOICE_COMMANDS.md)
+- [n8n Contract Freeze](Mobile%20Picking%20und%20Voice%20Assistant/docs/N8N_CONTRACT_FREEZE_V1.md)
+- [Quality Alert AI Fields](Mobile%20Picking%20und%20Voice%20Assistant/docs/QUALITY_ALERT_AI_FIELDS.md)
 
-## Setup in Kurzform
+## Quick Start
 
-```powershell
+```bash
+cd "Mobile Picking und Voice Assistant"
+docker compose build
 docker compose up -d
 ```
 
-Danach typischerweise:
+Typical local endpoints after setup:
 
-1. Odoo-Addons installieren oder upgraden
-2. `.env` sauber setzen und `ODOO_API_KEY` auf einen dedizierten Service-User legen
-3. n8n-Backup erzeugen: `bash infrastructure/scripts/import-workflows.sh backup`
-4. n8n-Workflows kontrolliert importieren: `bash infrastructure/scripts/import-workflows.sh import <backup-dir>`
-5. Workflows gezielt aktivieren: `bash infrastructure/scripts/import-workflows.sh activate <backup-dir> <workflow-file>`
-6. API und PWA pruefen
+- PWA: `https://<LAN-IP>/`
+- API docs: `https://<LAN-IP>/api/docs`
+- Odoo admin: `http://<HOST>:8069/`
+- n8n: `https://<LAN-IP>/n8n/`
 
-## Verifikation des Welle-A-Stands
+The full setup path, certificate handling, Odoo initialization, and workflow rollout steps are documented in [`docs/SETUP.md`](Mobile%20Picking%20und%20Voice%20Assistant/docs/SETUP.md).
 
-Lokal erfolgreich geprueft:
+## Verification
 
-- `python -m pytest backend/tests/test_n8n_internal_routes.py -q`
-- Python-Syntaxcheck der geaenderten Backend-Dateien
-- XML-Parse der Odoo-View
-- JSON-Parse des n8n-Workflows
+Recommended checks:
 
-Noch offen fuer den Live-Stand:
+```bash
+cd "Mobile Picking und Voice Assistant"
+python infrastructure/scripts/verify-workflows.py
+pytest backend/tests -q
+node --test n8n/tests/*.test.mjs
+npm run test:voice
+npm run test:ui
+git diff --check
+```
 
-- Odoo-Addon-Upgrade in der aktiven Datenbank
-- gestuften n8n-Importpfad gegen die Live-Runtime durchlaufen
-- Smoke-Tests fuer Voice, Quality und Replenishment live ausfuehren
-- Telemetrie-Export fuer das Live-Testfenster erzeugen
+Run live n8n workflow activation only after creating a backup with `infrastructure/scripts/import-workflows.sh`.
 
-## Naechste sinnvolle Schritte
+## Privacy And Safety
 
-1. gestuften n8n-Rollout mit `backup -> import -> activate` live durchlaufen
-2. Erfolgspfad und Fehlerpfad fuer Quality/Voice/Replenishment manuell pruefen
-3. Telemetrie mit `python infrastructure/scripts/export_telemetry_stats.py --since ...` auswertbar exportieren
+- Store credentials only in local environment files; never commit real Odoo, n8n, or webhook secrets.
+- Use a dedicated Odoo service user for backend access.
+- Keep operator-visible Odoo records truthful even when n8n handoff fails.
+- Quality-alert AI output is written through controlled fields and chatter text, not uncontrolled HTML fragments.
+- Do not treat local voice recognition as the only operational path; scanner and touch flows must continue to work.
+
+## Roadmap
+
+- Complete staged live rollout for Quality, Voice, and Replenishment paths.
+- Validate success and failure paths against the live Odoo and n8n runtime.
+- Export telemetry for rollout windows and compare it against expected behavior.
+- Continue hardening mobile UI, accessibility, and operator fallback flows.
