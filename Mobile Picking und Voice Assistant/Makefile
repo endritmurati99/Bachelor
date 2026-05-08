@@ -1,6 +1,9 @@
 .PHONY: help setup install-backend-deps install-ui-deps build-all build-backend build-odoo up down logs seed test test-ui test-visual test-visual-diff test-visual-diff-update test-a11y test-api test-n8n-api load-test verify-code verify-ui verify-visual verify-visual-diff verify-a11y verify-workflows verify-odoo-schema verify-stack verify clean
 
 SHELL := /bin/bash
+PYTHON ?= python3
+NPM ?= npm
+NPX ?= npx
 -include .env
 export
 
@@ -14,11 +17,11 @@ setup: ## Erstmalige Einrichtung
 	@echo "Setup fertig. Zertifikate: bash infrastructure/scripts/setup-certs.sh <LAN-IP>"
 
 install-backend-deps: ## Lokale Python-Abhaengigkeiten fuer Backend-Tests installieren
-	cd backend && python -m pip install --target .deps -r requirements-dev.txt
+	cd backend && $(PYTHON) -m pip install --target .deps -r requirements-dev.txt
 
 install-ui-deps: ## Playwright und Browser-Abhaengigkeiten installieren
-	npm.cmd install
-	npx.cmd playwright install chromium
+	$(NPM) install
+	$(NPX) playwright install chromium
 
 build-all: ## Alle Docker Images bauen
 	docker compose build
@@ -48,37 +51,37 @@ logs-odoo: ## Odoo-Logs
 	docker compose logs -f --tail=50 odoo
 
 seed: ## Seed-Daten laden
-	python infrastructure/scripts/seed-odoo.py --url http://localhost:8069 --db $${ODOO_DB:-picking} --user $${ODOO_USER:-admin} --api-key $${ODOO_API_KEY}
+	$(PYTHON) infrastructure/scripts/seed-odoo.py --url http://localhost:8069 --db $${ODOO_DB:-picking} --user $${ODOO_USER:-admin} --api-key $${ODOO_API_KEY}
 
 test: ## Backend-Tests
-	cd backend && PYTHONPATH=.deps python -m pytest -p pytest_asyncio tests/ -v
+	cd backend && PYTHONPATH=.deps $(PYTHON) -m pytest -p pytest_asyncio tests/ -v
 
 test-ui: ## Browser-Tests fuer die PWA
-	npx.cmd playwright test e2e/confirm-flow.spec.js e2e/pickings.spec.js e2e/quality-alert.spec.js
+	$(NPX) playwright test e2e/confirm-flow.spec.js e2e/pickings.spec.js e2e/quality-alert.spec.js
 
 test-visual: ## Visuelles PWA-Artefakt fuer den Mobile-Viewport erzeugen
 	node e2e/capture-sight.js
 
 test-visual-diff: ## Visuelle Snapshot-Tests fuer stabile Kern-Views
-	npx.cmd playwright test e2e/visual.spec.js
+	$(NPX) playwright test e2e/visual.spec.js
 
 test-visual-diff-update: ## Snapshot-Baselines fuer visuelle Tests aktualisieren
-	npx.cmd playwright test e2e/visual.spec.js --update-snapshots
+	$(NPX) playwright test e2e/visual.spec.js --update-snapshots
 
 test-a11y: ## Accessibility-Checks fuer die PWA mit Axe + Playwright
-	npx.cmd playwright test e2e/a11y.spec.js
+	$(NPX) playwright test e2e/a11y.spec.js
 
 test-api: ## API-Rauchtest
-	python infrastructure/scripts/test-api.py
+	$(PYTHON) infrastructure/scripts/test-api.py
 
 test-n8n-api: ## n8n Public API mit API-Key pruefen
-	python infrastructure/scripts/test-n8n-api.py
+	$(PYTHON) infrastructure/scripts/test-n8n-api.py
 
 load-test: ## 100 Quality-Alert-Requests gegen laufenden Stack (Lasttest)
-	python infrastructure/scripts/load-test-quality-alerts.py --count $${LOAD_TEST_COUNT:-100} --concurrency $${LOAD_TEST_CONCURRENCY:-10}
+	$(PYTHON) infrastructure/scripts/load-test-quality-alerts.py --count $${LOAD_TEST_COUNT:-100} --concurrency $${LOAD_TEST_CONCURRENCY:-10}
 
 verify-workflows: ## n8n-Workflow-Vertraege gegen Backend-Webhooks pruefen
-	python infrastructure/scripts/verify-workflows.py
+	$(PYTHON) infrastructure/scripts/verify-workflows.py
 
 verify-odoo-schema: ## Ruflo Odoo Audit
 	@echo "🛡️ Starting Ruflo Odoo Audit..."

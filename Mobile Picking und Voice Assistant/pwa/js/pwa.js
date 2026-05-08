@@ -7,9 +7,8 @@ let serviceWorkerRegistration = null;
 let hasTriggeredControllerRefresh = false;
 let lastResumeSignalAt = 0;
 
-function showInstallButton() {
-    // Optional: Install-Banner anzeigen
-    console.log('PWA kann installiert werden');
+function showInstallButton(options = {}) {
+    options.onInstallPromptReady?.();
 }
 
 function shouldThrottleResumeSignal() {
@@ -89,7 +88,7 @@ export function initPWA(options = {}) {
     window.addEventListener('beforeinstallprompt', (event) => {
         event.preventDefault();
         deferredPrompt = event;
-        showInstallButton();
+        showInstallButton(options);
     });
 
     window.addEventListener('online', async () => {
