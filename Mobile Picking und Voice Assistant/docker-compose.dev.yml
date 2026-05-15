@@ -4,7 +4,15 @@ services:
     volumes:
       - ./backend/app:/app/app:ro
       - ${OBSIDIAN_HOST_PATH:-../Notzien}:/obsidian:ro
+    ports:
+      - "8000:8000"
     command: [ "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--log-level", "info", "--reload" ]
+
+  # Avoid clashing with host-level reverse proxies on 80/443 during local development.
+  caddy:
+    ports: !override
+      - "8080:80"
+      - "8443:443"
 
   odoo:
     ports:
@@ -26,3 +34,8 @@ services:
   mailpit:
     ports:
       - "8025:8025"
+
+  # Cloudflare tunnel needs a real token; keep it out of the default local dev stack.
+  tunnel:
+    profiles:
+      - cloudflare
