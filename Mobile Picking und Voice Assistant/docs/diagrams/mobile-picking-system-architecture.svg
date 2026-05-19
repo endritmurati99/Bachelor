@@ -63,6 +63,8 @@
 <text x="1310" y="659.2" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#52606d" text-anchor="start">Writes</text>
 <line x1="348" y1="300" x2="472" y2="300" stroke="#1971c2" stroke-width="3" marker-end="url(#arrow)"/>
 <line x1="758" y1="453" x2="882" y2="315" stroke="#099268" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="1168" y1="300" x2="1292" y2="300" stroke="#c2255c" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="8 7"/>
+<text x="1184" y="283.0" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#c2255c" text-anchor="start">Odoo-Trigger / Event</text>
 <line x1="615" y1="517" x2="615" y2="565" stroke="#1971c2" stroke-width="3" marker-end="url(#arrow)"/>
 <line x1="1025" y1="357" x2="1025" y2="405" stroke="#303846" stroke-width="2" marker-end="url(#arrow)"/>
 <line x1="1025" y1="565" x2="758" y2="517" stroke="#f08c00" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="8 7"/>

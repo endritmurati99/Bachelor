@@ -1684,16 +1684,16 @@
     {
       "id": "arr_0050",
       "type": "arrow",
-      "x": 615,
-      "y": 517,
-      "width": 0,
-      "height": 48,
+      "x": 1168,
+      "y": 300,
+      "width": 124,
+      "height": 0,
       "angle": 0,
-      "strokeColor": "#1971c2",
+      "strokeColor": "#c2255c",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
-      "strokeWidth": 3,
-      "strokeStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dashed",
       "roughness": 0,
       "opacity": 100,
       "groupIds": [],
@@ -1715,8 +1715,8 @@
           0
         ],
         [
-          0,
-          48
+          124,
+          0
         ]
       ],
       "lastCommittedPoint": null,
@@ -1726,25 +1726,23 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "arr_0051",
-      "type": "arrow",
-      "x": 1025,
-      "y": 357,
-      "width": 0,
-      "height": 48,
+      "id": "txt_0051",
+      "type": "text",
+      "x": 1184,
+      "y": 271,
+      "width": 100,
+      "height": 15.36,
       "angle": 0,
-      "strokeColor": "#303846",
+      "strokeColor": "#c2255c",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
-      "strokeWidth": 2,
+      "strokeWidth": 1,
       "strokeStyle": "solid",
       "roughness": 0,
       "opacity": 100,
       "groupIds": [],
       "frameId": null,
-      "roundness": {
-        "type": 2
-      },
+      "roundness": null,
       "seed": 51459,
       "version": 1,
       "versionNonce": 138363,
@@ -1753,35 +1751,29 @@
       "updated": 1,
       "link": null,
       "locked": false,
-      "points": [
-        [
-          0,
-          0
-        ],
-        [
-          0,
-          48
-        ]
-      ],
-      "lastCommittedPoint": null,
-      "startBinding": null,
-      "endBinding": null,
-      "startArrowhead": null,
-      "endArrowhead": "arrow"
+      "text": "Odoo-Trigger / Event",
+      "fontSize": 12,
+      "fontFamily": 1,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "Odoo-Trigger / Event",
+      "lineHeight": 1.2,
+      "fontWeight": "700"
     },
     {
       "id": "arr_0052",
       "type": "arrow",
-      "x": 1025,
-      "y": 565,
-      "width": -267,
-      "height": -48,
+      "x": 615,
+      "y": 517,
+      "width": 0,
+      "height": 48,
       "angle": 0,
-      "strokeColor": "#f08c00",
+      "strokeColor": "#1971c2",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
-      "strokeWidth": 2,
-      "strokeStyle": "dashed",
+      "strokeWidth": 3,
+      "strokeStyle": "solid",
       "roughness": 0,
       "opacity": 100,
       "groupIds": [],
@@ -1803,8 +1795,8 @@
           0
         ],
         [
-          -267,
-          -48
+          0,
+          48
         ]
       ],
       "lastCommittedPoint": null,
@@ -1816,16 +1808,16 @@
     {
       "id": "arr_0053",
       "type": "arrow",
-      "x": 1455,
+      "x": 1025,
       "y": 357,
       "width": 0,
       "height": 48,
       "angle": 0,
-      "strokeColor": "#c2255c",
+      "strokeColor": "#303846",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
       "strokeWidth": 2,
-      "strokeStyle": "dashed",
+      "strokeStyle": "solid",
       "roughness": 0,
       "opacity": 100,
       "groupIds": [],
@@ -1860,10 +1852,10 @@
     {
       "id": "arr_0054",
       "type": "arrow",
-      "x": 215,
-      "y": 517,
-      "width": 0,
-      "height": 48,
+      "x": 1025,
+      "y": 565,
+      "width": -267,
+      "height": -48,
       "angle": 0,
       "strokeColor": "#f08c00",
       "backgroundColor": "transparent",
@@ -1891,6 +1883,50 @@
           0
         ],
         [
+          -267,
+          -48
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": null,
+      "endBinding": null,
+      "startArrowhead": null,
+      "endArrowhead": "arrow"
+    },
+    {
+      "id": "arr_0055",
+      "type": "arrow",
+      "x": 1455,
+      "y": 357,
+      "width": 0,
+      "height": 48,
+      "angle": 0,
+      "strokeColor": "#c2255c",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dashed",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 2
+      },
+      "seed": 55495,
+      "version": 1,
+      "versionNonce": 149215,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
           0,
           48
         ]
@@ -1902,7 +1938,51 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "rect_0055",
+      "id": "arr_0056",
+      "type": "arrow",
+      "x": 215,
+      "y": 517,
+      "width": 0,
+      "height": 48,
+      "angle": 0,
+      "strokeColor": "#f08c00",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dashed",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": {
+        "type": 2
+      },
+      "seed": 56504,
+      "version": 1,
+      "versionNonce": 151928,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          48
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": null,
+      "endBinding": null,
+      "startArrowhead": null,
+      "endArrowhead": "arrow"
+    },
+    {
+      "id": "rect_0057",
       "type": "rectangle",
       "x": 40,
       "y": 750,
@@ -1922,9 +2002,9 @@
         "type": 3,
         "value": 18
       },
-      "seed": 55495,
+      "seed": 57513,
       "version": 1,
-      "versionNonce": 149215,
+      "versionNonce": 154641,
       "isDeleted": false,
       "boundElements": null,
       "updated": 1,
@@ -1932,7 +2012,7 @@
       "locked": false
     },
     {
-      "id": "txt_0056",
+      "id": "txt_0058",
       "type": "text",
       "x": 58,
       "y": 766,
@@ -1949,9 +2029,9 @@
       "groupIds": [],
       "frameId": null,
       "roundness": null,
-      "seed": 56504,
+      "seed": 58522,
       "version": 1,
-      "versionNonce": 151928,
+      "versionNonce": 157354,
       "isDeleted": false,
       "boundElements": null,
       "updated": 1,
@@ -1968,7 +2048,7 @@
       "fontWeight": "700"
     },
     {
-      "id": "txt_0057",
+      "id": "txt_0059",
       "type": "text",
       "x": 58,
       "y": 800,
@@ -1985,9 +2065,9 @@
       "groupIds": [],
       "frameId": null,
       "roundness": null,
-      "seed": 57513,
+      "seed": 59531,
       "version": 1,
-      "versionNonce": 154641,
+      "versionNonce": 160067,
       "isDeleted": false,
       "boundElements": null,
       "updated": 1,
@@ -2004,7 +2084,7 @@
       "fontWeight": "400"
     },
     {
-      "id": "rect_0058",
+      "id": "rect_0060",
       "type": "rectangle",
       "x": 40,
       "y": 870,
@@ -2024,9 +2104,9 @@
         "type": 3,
         "value": 18
       },
-      "seed": 58522,
+      "seed": 60540,
       "version": 1,
-      "versionNonce": 157354,
+      "versionNonce": 162780,
       "isDeleted": false,
       "boundElements": null,
       "updated": 1,
@@ -2034,7 +2114,7 @@
       "locked": false
     },
     {
-      "id": "txt_0059",
+      "id": "txt_0061",
       "type": "text",
       "x": 58,
       "y": 886,
@@ -2051,9 +2131,9 @@
       "groupIds": [],
       "frameId": null,
       "roundness": null,
-      "seed": 59531,
+      "seed": 61549,
       "version": 1,
-      "versionNonce": 160067,
+      "versionNonce": 165493,
       "isDeleted": false,
       "boundElements": null,
       "updated": 1,
@@ -2070,7 +2150,7 @@
       "fontWeight": "700"
     },
     {
-      "id": "txt_0060",
+      "id": "txt_0062",
       "type": "text",
       "x": 58,
       "y": 920,
@@ -2087,9 +2167,9 @@
       "groupIds": [],
       "frameId": null,
       "roundness": null,
-      "seed": 60540,
+      "seed": 62558,
       "version": 1,
-      "versionNonce": 162780,
+      "versionNonce": 168206,
       "isDeleted": false,
       "boundElements": null,
       "updated": 1,
@@ -2106,7 +2186,7 @@
       "fontWeight": "400"
     },
     {
-      "id": "rect_0061",
+      "id": "rect_0063",
       "type": "rectangle",
       "x": 600,
       "y": 870,
@@ -2126,9 +2206,9 @@
         "type": 3,
         "value": 18
       },
-      "seed": 61549,
+      "seed": 63567,
       "version": 1,
-      "versionNonce": 165493,
+      "versionNonce": 170919,
       "isDeleted": false,
       "boundElements": null,
       "updated": 1,
@@ -2136,7 +2216,7 @@
       "locked": false
     },
     {
-      "id": "txt_0062",
+      "id": "txt_0064",
       "type": "text",
       "x": 618,
       "y": 886,
@@ -2153,9 +2233,9 @@
       "groupIds": [],
       "frameId": null,
       "roundness": null,
-      "seed": 62558,
+      "seed": 64576,
       "version": 1,
-      "versionNonce": 168206,
+      "versionNonce": 173632,
       "isDeleted": false,
       "boundElements": null,
       "updated": 1,
@@ -2172,7 +2252,7 @@
       "fontWeight": "700"
     },
     {
-      "id": "txt_0063",
+      "id": "txt_0065",
       "type": "text",
       "x": 618,
       "y": 920,
@@ -2189,9 +2269,9 @@
       "groupIds": [],
       "frameId": null,
       "roundness": null,
-      "seed": 63567,
+      "seed": 65585,
       "version": 1,
-      "versionNonce": 170919,
+      "versionNonce": 176345,
       "isDeleted": false,
       "boundElements": null,
       "updated": 1,
@@ -2208,7 +2288,7 @@
       "fontWeight": "400"
     },
     {
-      "id": "rect_0064",
+      "id": "rect_0066",
       "type": "rectangle",
       "x": 1160,
       "y": 870,
@@ -2228,9 +2308,9 @@
         "type": 3,
         "value": 18
       },
-      "seed": 64576,
+      "seed": 66594,
       "version": 1,
-      "versionNonce": 173632,
+      "versionNonce": 179058,
       "isDeleted": false,
       "boundElements": null,
       "updated": 1,
@@ -2238,7 +2318,7 @@
       "locked": false
     },
     {
-      "id": "txt_0065",
+      "id": "txt_0067",
       "type": "text",
       "x": 1178,
       "y": 886,
@@ -2255,9 +2335,9 @@
       "groupIds": [],
       "frameId": null,
       "roundness": null,
-      "seed": 65585,
+      "seed": 67603,
       "version": 1,
-      "versionNonce": 176345,
+      "versionNonce": 181771,
       "isDeleted": false,
       "boundElements": null,
       "updated": 1,
@@ -2274,7 +2354,7 @@
       "fontWeight": "700"
     },
     {
-      "id": "txt_0066",
+      "id": "txt_0068",
       "type": "text",
       "x": 1178,
       "y": 920,
@@ -2291,9 +2371,9 @@
       "groupIds": [],
       "frameId": null,
       "roundness": null,
-      "seed": 66594,
+      "seed": 68612,
       "version": 1,
-      "versionNonce": 179058,
+      "versionNonce": 184484,
       "isDeleted": false,
       "boundElements": null,
       "updated": 1,
@@ -2310,7 +2390,7 @@
       "fontWeight": "400"
     },
     {
-      "id": "rect_0067",
+      "id": "rect_0069",
       "type": "rectangle",
       "x": 40,
       "y": 1045,
@@ -2330,9 +2410,9 @@
         "type": 3,
         "value": 18
       },
-      "seed": 67603,
+      "seed": 69621,
       "version": 1,
-      "versionNonce": 181771,
+      "versionNonce": 187197,
       "isDeleted": false,
       "boundElements": null,
       "updated": 1,
@@ -2340,7 +2420,7 @@
       "locked": false
     },
     {
-      "id": "txt_0068",
+      "id": "txt_0070",
       "type": "text",
       "x": 58,
       "y": 1061,
@@ -2357,9 +2437,9 @@
       "groupIds": [],
       "frameId": null,
       "roundness": null,
-      "seed": 68612,
+      "seed": 70630,
       "version": 1,
-      "versionNonce": 184484,
+      "versionNonce": 189910,
       "isDeleted": false,
       "boundElements": null,
       "updated": 1,
@@ -2376,7 +2456,7 @@
       "fontWeight": "700"
     },
     {
-      "id": "txt_0069",
+      "id": "txt_0071",
       "type": "text",
       "x": 58,
       "y": 1095,
@@ -2393,9 +2473,9 @@
       "groupIds": [],
       "frameId": null,
       "roundness": null,
-      "seed": 69621,
+      "seed": 71639,
       "version": 1,
-      "versionNonce": 187197,
+      "versionNonce": 192623,
       "isDeleted": false,
       "boundElements": null,
       "updated": 1,

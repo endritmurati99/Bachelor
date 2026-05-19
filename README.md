@@ -6,7 +6,7 @@ Bachelorarbeit-PoC fuer einen hybriden, sprachgestuetzten mobilen Picking-Assist
 
 - Odoo bleibt System of Record
 - FastAPI bleibt die einzige App-API fuer die PWA
-- n8n bleibt Orchestrator fuer async Events und synchrone Ausnahmeassistenz
+- n8n bleibt Orchestrator fuer async Events, Odoo-Trigger und synchrone Ausnahmeassistenz
 - Whisper laeuft lokal als ASR-Service; der normale Voice-Pfad bleibt ohne n8n
 - Welle A fuer die Quality-Alert-KI-Bewertung ist im Repo umgesetzt
 - Phase A-C fuer kontrollierte Inbetriebnahme, neutrales Integrations-Logging und Telemetrie-Export ist im Repo vorbereitet
@@ -51,7 +51,7 @@ Nicht Teil von Welle A:
 ### Quality Alerts
 - `POST /api/quality-alerts` akzeptiert Beschreibung, Kontext und optional mehrere Fotos
 - Alerts werden zuerst in Odoo erstellt; `ai_evaluation_status = pending` wird nur gesetzt, wenn `quality-alert-created` erfolgreich an n8n uebergeben wurde
-- wenn die n8n-Uebergabe scheitert, bleibt der Alert sichtbar, wird aber auf `failed` markiert und im Chatter begruendet
+- wenn die n8n-Uebergabe scheitert, nutzt FastAPI zuerst die lokale Backend-Fallback-Bewertung; `failed` wird nur gesetzt, wenn auch dieser Fallback scheitert
 - n8n bewertet den Alert asynchron und schreibt kontrolliert ueber FastAPI zurueck
 - Odoo zeigt im Hauptblock `Systembewertung` nur:
   - Analyse-Status
@@ -65,6 +65,7 @@ Nicht Teil von Welle A:
 PWA -> Caddy -> FastAPI -> Odoo
                 |-> Whisper
                 `-> n8n
+Odoo --Trigger/Event--> n8n
 n8n -> interne FastAPI-Callbacks -> Odoo
 ```
 

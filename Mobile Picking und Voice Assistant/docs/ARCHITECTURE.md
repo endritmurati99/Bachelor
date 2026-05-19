@@ -16,7 +16,7 @@
 - `Odoo`
   - fachliche Datenquelle fuer Pickings, Quality Alerts, Nutzer und Lagerplaetze
 - `n8n`
-  - Orchestrator fuer async Events und synchrone Ausnahmeassistenz
+  - Orchestrator fuer async Events, Odoo-Trigger und synchrone Ausnahmeassistenz
 - `Whisper`
   - lokaler ASR-Service fuer `POST /api/voice/recognize`
 
@@ -25,8 +25,9 @@
 1. Odoo bleibt System of Record.
 2. FastAPI ist die einzige API-Schicht fuer die PWA.
 3. n8n liegt nicht im normalen Voice-Hot-Path.
-4. Fachliche Writes aus n8n laufen nur ueber interne FastAPI-Callbacks.
-5. Touch bleibt Fallback, Voice ist Enhancement.
+4. Odoo kann n8n-Workflows ueber Trigger/Webhook-Events starten.
+5. Fachliche Writes aus n8n laufen nur ueber interne FastAPI-Callbacks.
+6. Touch bleibt Fallback, Voice ist Enhancement.
 
 ## Hauptfluesse
 
@@ -34,8 +35,8 @@
 1. PWA -> `POST /api/pickings/{id}/confirm-line`
 2. FastAPI validiert Identitaet, Claim und Idempotency
 3. FastAPI schreibt nach Odoo
-4. FastAPI feuert `pick-confirmed` asynchron an n8n
-5. Wenn die n8n-Uebergabe fehlschlaegt, bleibt das Picking fachlich abgeschlossen, aber die Antwort wird als degradierter Folgeprozess markiert
+4. FastAPI feuert `pick-confirmed` asynchron an n8n; zusaetzlich koennen Odoo-seitige Trigger n8n-Workflows starten
+5. Wenn die n8n-Uebergabe scheitert, bleibt das Picking fachlich abgeschlossen, aber die Antwort wird als degradierter Folgeprozess markiert
 
 ### Voice-Hot-Path
 1. PWA -> `POST /api/voice/recognize`
