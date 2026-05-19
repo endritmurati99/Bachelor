@@ -9,7 +9,7 @@
 
 ## Systemrollen
 
-- `PWA`
+- `Progressive Web App (PWA)`
   - mobile Bedienoberflaeche fuer Picking, Voice, Scan und Quality Alerts
 - `FastAPI`
   - App-API, Odoo-Adapter, Idempotency- und Claim-Schicht
